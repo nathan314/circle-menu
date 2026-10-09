@@ -89,24 +89,24 @@
             if (this.isCompact) {
                 return {
                     stageW,
-                    radius: 52,
-                    beamRadialOffset: 2, // Outward offset beyond dash boundary
-                    dashWidth: 36,
-                    beamSVGWidth: 46,
-                    beamHeight: 52,
-                    hitDistance: 130
+                    radius: this.options.radius || 52,
+                    beamRadialOffset: this.options.beamRadialOffset !== undefined ? this.options.beamRadialOffset : 2,
+                    dashWidth: this.options.dashWidth || 36,
+                    beamSVGWidth: this.options.beamSVGWidth || 96, // Wider base to match the full curved dash length
+                    beamHeight: this.options.beamHeight || 90,     // Increased reach and projection length
+                    hitDistance: this.options.hitDistance || 130
                 };
             }
 
             if (this.isMobileDock) {
                 return {
                     stageW,
-                    radius: 78, // Dash circle radius for mobile dock
-                    beamRadialOffset: 3, // Flush & slightly outward from perimeter
-                    dashWidth: 50,
-                    beamSVGWidth: 92,
-                    beamHeight: 140,
-                    hitDistance: 160
+                    radius: this.options.radius || 78,
+                    beamRadialOffset: this.options.beamRadialOffset !== undefined ? this.options.beamRadialOffset : 3,
+                    dashWidth: this.options.dashWidth || 50,
+                    beamSVGWidth: this.options.beamSVGWidth || 110,
+                    beamHeight: this.options.beamHeight || 140,
+                    hitDistance: this.options.hitDistance || 160
                 };
             }
 
