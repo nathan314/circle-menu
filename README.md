@@ -7,6 +7,7 @@
 </p>
 
 <p align="center">
+  <a href="https://codepen.io/nstargina/pen/circle-menu"><img src="https://img.shields.io/badge/CodePen-Live%20Demo-black?style=flat&logo=codepen&logoColor=white" alt="CodePen Live Demo"></a>
   <a href="https://opensource.org/licenses/MIT"><img src="https://img.shields.io/badge/License-MIT-yellow.svg" alt="License: MIT"></a>
   <a href="#"><img src="https://img.shields.io/badge/Engine-Vanilla%20JS%20(ES6+)-blue.svg" alt="Engine: Vanilla JS"></a>
   <a href="https://greensock.com/gsap/"><img src="https://img.shields.io/badge/Animation-GSAP%203-green.svg" alt="Animation: GSAP 3"></a>
