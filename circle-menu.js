@@ -17,6 +17,22 @@
     'use strict';
 
     class CircularMenuEngine {
+        static instances = [];
+
+        static register(instance) {
+            if (!CircularMenuEngine.instances.includes(instance)) {
+                CircularMenuEngine.instances.push(instance);
+            }
+        }
+
+        static hideOtherInstances(currentInstance) {
+            CircularMenuEngine.instances.forEach((inst) => {
+                if (inst !== currentInstance && inst.isRevealed) {
+                    inst.hide();
+                }
+            });
+        }
+
         constructor(options) {
             this.options = options || {};
             this.stage = document.getElementById(options.stageId);
@@ -53,6 +69,8 @@
             this.isApexLocked = false;
             this.hoverLeaveTimer = null;
             this.lerpFactor = options.lerpFactor || 0.22;
+
+            CircularMenuEngine.register(this);
 
             if (this.stage && this.wheel) {
                 this.init();
@@ -367,6 +385,7 @@
 
         reveal() {
             if (this.isRevealed) return;
+            CircularMenuEngine.hideOtherInstances(this);
             this.isRevealed = true;
             const hasGsap = typeof gsap !== 'undefined';
 
@@ -516,7 +535,13 @@
             // Desktop Trigger Zone Listeners
             if (this.triggerArea) {
                 this.triggerArea.addEventListener('mouseenter', () => {
-                    if (window.innerWidth >= 1024) this.reveal();
+                    if (window.innerWidth >= 1024) {
+                        if (this.isHero) {
+                            const anotherRevealed = CircularMenuEngine.instances.some(inst => inst !== this && inst.isRevealed);
+                            if (anotherRevealed) return;
+                        }
+                        this.reveal();
+                    }
                 });
                 this.triggerArea.addEventListener('mouseleave', () => {
                     if (window.innerWidth >= 1024) this.hide();
@@ -526,6 +551,47 @@
             // Desktop Mouse Tracking & Precise Hit Testing (Dashes + Light Beams)
             window.addEventListener('mousemove', (e) => {
                 if (window.innerWidth < 1024) return;
+
+                const target = e.target;
+                const isOverHeader = !!(target && target.closest && target.closest('header, #header-capsule, #header-dial-container'));
+
+                // 1. ISOLATION RULE: If Hero menu is tracking, but mouse is over header or another instance is active
+                if (this.isHero) {
+                    const headerEl = document.querySelector('header') || document.getElementById('header-capsule');
+                    const headerBottom = headerEl ? headerEl.getBoundingClientRect().bottom + 12 : 85;
+
+                    const anotherRevealed = CircularMenuEngine.instances.some(inst => inst !== this && inst.isRevealed);
+                    if (isOverHeader || e.clientY <= headerBottom || anotherRevealed) {
+                        if (this.isRevealed) this.hide();
+                        return;
+                    }
+
+                    // Check if mouse is physically inside the hero interaction zone bounding box
+                    const triggerRect = this.triggerArea ? this.triggerArea.getBoundingClientRect() : null;
+                    if (triggerRect) {
+                        const inHeroBounds = (
+                            e.clientX >= (triggerRect.left - 40) &&
+                            e.clientX <= (triggerRect.right + 40) &&
+                            e.clientY >= (triggerRect.top - 20) &&
+                            e.clientY <= (triggerRect.bottom + 40)
+                        );
+                        if (!inHeroBounds) {
+                            if (this.isRevealed) this.hide();
+                            return;
+                        }
+                    }
+                }
+
+                // 2. ISOLATION RULE FOR COMPACT HEADER:
+                if (this.isCompact) {
+                    const center = this.getCenter();
+                    const dist = Math.hypot(center.x - e.clientX, center.y - e.clientY);
+                    if (dist > this.dimensions.hitDistance) {
+                        if (this.isRevealed) this.hide();
+                        return;
+                    }
+                }
+
                 const center = this.getCenter();
                 const distX = center.x - e.clientX;
                 const distY = center.y - e.clientY;

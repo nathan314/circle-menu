@@ -564,6 +564,16 @@
                 }
             });
 
+            // Header Capsule hover isolation listener
+            const headerCapsule = document.getElementById('header-capsule');
+            if (headerCapsule) {
+                headerCapsule.addEventListener('mouseenter', () => {
+                    if (heroMenu && heroMenu.isRevealed) {
+                        heroMenu.hide();
+                    }
+                });
+            }
+
         });
     </script>
 </body>
