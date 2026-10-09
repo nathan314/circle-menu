@@ -1,383 +1,1090 @@
 <!DOCTYPE html>
-<html lang="pt-BR">
+<html lang="en" class="light">
 
 <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <meta name="robots" content="noindex, nofollow" />
-    <title>Resonate - Animated Circular Menu</title>
-    <!-- Google Fonts -->
+    <title>Circle Menu UI v.4.5 (CodePen Edition)</title>
+    <!-- 
+    ========================================================================
+    CIRCLE MENU UI v.4.5 — INTERACTIVE RADIAL NAVIGATION ENGINE
+    Designed & Engineered by Natã da Silva Targina (NStar Concepts)
+    
+    • True NStar Architecture: 1 Base Wheel SVG + 1 Active Rotating Arc SVG
+    • Clean Zero Pre-Selection State (Starts completely in clean idle)
+    • Desktop Hover Precision & Mobile Touch Apex Isolation
+    • Focused Interaction Zone (60%~80% center frame activation)
+    • Tailwind CSS CDN + GSAP 3 (Zero Build Setup)
+    ========================================================================
+    -->
+
+    <!-- Google Fonts: Orbitron & Kanit -->
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link
-        href="https://fonts.googleapis.com/css2?family=Orbitron:wght@500;700;900&family=Rajdhani:wght@500;600;700&display=swap"
+        href="https://fonts.googleapis.com/css2?family=Kanit:ital,wght@0,300;0,400;0,500;0,600;0,700;1,300;1,400&family=Orbitron:wght@500;600;700;800;900&family=Rajdhani:wght@500;600;700&display=swap"
         rel="stylesheet" />
+
     <!-- Tailwind CSS CDN -->
     <script src="https://cdn.tailwindcss.com"></script>
     <script>
         tailwind.config = {
+            darkMode: 'class',
             theme: {
                 extend: {
                     fontFamily: {
                         orbitron: ['Orbitron', 'sans-serif'],
+                        kanit: ['Kanit', 'sans-serif'],
                         rajdhani: ['Rajdhani', 'sans-serif'],
                     },
                     colors: {
-                        neonGreen: '#00FF26',
-                        darkBg: '#05080e',
-                        panelBg: '#0f172a',
+                        'ns-orange': '#FFA21F',
+                        'ns-red': '#FF3B0F',
+                        'blue-emphasis': '#00a2ff',
+                        'yellow-emphasis': '#FFEA47',
+                        'dark-night': '#0a1017',
+                        'dark-polaroid': '#192733',
+                        'dark-card': '#14202b',
+                        'silver-emphasistext-light': '#243242',
+                        'polaroid-light': '#f8fafc',
                     }
                 }
             }
-        }
+        };
     </script>
+
     <style>
+        :root {
+            --blue-emphasis: #00a2ff;
+            --ns-orange: #FFA21F;
+            --yellow-emphasis: #FFEA47;
+            --dark-polaroid: #192733;
+            --hightech-light: #99aeba;
+            --polaroid-light: #f8fafc;
+        }
+
         body {
-            background-color: #05080e;
-            color: #ffffff;
-            font-family: 'Rajdhani', sans-serif;
+            background-color: var(--polaroid-light);
+            color: var(--dark-polaroid);
+            font-family: 'Kanit', sans-serif;
             overflow-x: hidden;
+            -webkit-tap-highlight-color: transparent;
         }
 
-        /* Ambient Glow & Grid */
-        .bg-grid {
-            background-image:
-                radial-gradient(circle at 50% 50%, rgba(0, 255, 38, 0.06) 0%, transparent 60%),
-                linear-gradient(to right, rgba(255, 255, 255, 0.02) 1px, transparent 1px),
-                linear-gradient(to bottom, rgba(255, 255, 255, 0.02) 1px, transparent 1px);
-            background-size: 100% 100%, 40px 40px, 40px 40px;
+        /* Hero Background with Official Light Mode Vector Artwork */
+        .hero-vector-bg {
+            background: url('https://nstarconcepts.com/wp-content/themes/nstar-fullbychild-v4/img/bg_footer_lightMode.svg'), linear-gradient(180deg, var(--blue-emphasis) -50%, var(--polaroid-light) 100%);
+            background-size: cover;
+            background-position: center bottom;
+            background-repeat: no-repeat;
         }
 
-        /* Circular Green Perimeter Line */
-        .green-perimeter-ring {
-            border: 1.5px solid #00FF26;
-            box-shadow: 0 0 12px rgba(0, 255, 38, 0.5), inset 0 0 12px rgba(0, 255, 38, 0.2);
+        .glass-capsule {
+            background: rgba(255, 255, 255, 0.94);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            border: 1px solid rgba(255, 255, 255, 0.95);
+            box-shadow: 0 10px 30px rgba(0, 162, 255, 0.12), 0 4px 12px rgba(0, 0, 0, 0.04);
         }
 
-        /* Circular Menu Track Ticks */
-        .dial-ticks {
-            background: repeating-conic-gradient(from 0deg,
-                    rgba(0, 255, 38, 0.3) 0deg 1deg,
-                    transparent 1deg 15deg);
-            mask-image: radial-gradient(circle, transparent 58%, black 60%, black 68%, transparent 70%);
-            -webkit-mask-image: radial-gradient(circle, transparent 58%, black 60%, black 68%, transparent 70%);
-        }
-
-        /* Glow effects */
-        .text-glow {
-            text-shadow: 0 0 12px rgba(0, 255, 38, 0.8), 0 0 25px rgba(0, 255, 38, 0.4);
-        }
-
-        /* Lightning Flash Effect */
-        .lightning-flash {
-            position: absolute;
-            inset: 0;
-            border-radius: 9999px;
-            background: radial-gradient(circle, rgba(0, 255, 38, 0.8) 0%, rgba(85, 224, 255, 0.3) 40%, transparent 70%);
-            pointer-events: none;
-            opacity: 0;
-            z-index: 40;
-        }
-
-        /* Light beam container item */
-        .beam-item-container {
-            position: absolute;
-            width: 54px;
-            height: 324px;
-            pointer-events: auto;
-            cursor: pointer;
-            /* transform-origin at base of beam (bottom center) */
+        .beam-box {
             transform-origin: 50% 100%;
-        }
-
-        .beam-svg-img {
-            width: 100%;
-            height: 100%;
-            transform-origin: 50% 100%;
-            transition: filter 0.3s ease;
-        }
-
-        .beam-item-container:hover .beam-svg-img {
-            filter: drop-shadow(0 0 18px rgba(255, 250, 93, 0.9)) drop-shadow(0 0 35px rgba(85, 224, 255, 0.8));
         }
     </style>
 </head>
 
-<!-- <body class="w-screen h-screen bg-grid flex flex-col items-center justify-center relative overflow-hidden"> -->
+<body class="min-h-screen flex flex-col justify-between select-none">
 
-<body class="bg-grid relative">
+    <!-- Mobile Fixed Top Title Display (Apex Projection) -->
+    <div id="mobile-fixed-top-container"
+        class="lg:hidden fixed top-8 left-1/2 -translate-x-1/2 z-50 text-center pointer-events-none w-full px-4 transition-all duration-300">
+        <h1 id="mobile-fixed-top-title"
+            class="font-orbitron font-black text-2xl sm:text-3xl tracking-[0.25em] text-dark-polaroid uppercase drop-shadow-[0_2px_12px_rgba(255,255,255,0.95)] opacity-0 transform -translate-y-2">
+            &nbsp;
+        </h1>
+    </div>
 
-    <!-- Header info -->
-    <section class="w-full h-screen flex flex-col items-center justify-center relative overflow-hidden">
-        <header class="absolute top-6 left-8 z-50 flex items-center gap-3">
-            <div class="w-3 h-3 rounded-full bg-neonGreen animate-pulse"></div>
-            <span class="font-orbitron tracking-widest text-xs text-gray-400 uppercase">Resonate Interactive Dial
-                v2.0</span>
-        </header>
-        <!-- Controls & Instructions overlay -->
-        <footer class="absolute bottom-6 z-50 text-center text-xs text-gray-500 font-rajdhani tracking-wider">
-            <p>MOVA O MOUSE AO REDOR DO CÍRCULO PARA GIRAR O MENU &bull; PASSE O MOUSE NOS FEIXES DE LUZ PARA EXPANDIR
+    <!-- Desktop Floating Header Capsule -->
+    <header id="desktop-top-header"
+        class="hidden lg:flex fixed top-8 left-1/2 -translate-x-1/2 z-50 w-full max-w-2xl px-4 pointer-events-none">
+        <div
+            class="w-full glass-capsule h-16 rounded-full px-6 flex items-center justify-between shadow-lg pointer-events-auto relative">
+
+            <!-- Dedicated Header Active Label Display (Left of Capsule) -->
+            <div class="flex items-center gap-2.5 min-w-[160px]">
+                <span id="header-active-title"
+                    class="font-orbitron font-extrabold text-xs tracking-[0.2em] text-dark-polaroid uppercase opacity-0">
+                    &nbsp;
+                </span>
+            </div>
+
+            <!-- Compact Circular Menu (Centered in Header Capsule) -->
+            <div class="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2">
+                <div id="header-dial-container"
+                    class="relative w-48 h-18 flex items-center justify-center cursor-pointer">
+
+                    <div id="header-wheel-wrapper"
+                        class="absolute -inset-10 flex items-center justify-center opacity-0 scale-105 will-change-transform pointer-events-none m-auto lg:w-[7rem] lg:h-[7rem]">
+                        <div id="header-menu-wheel"
+                            class="relative w-full h-full flex items-center justify-center will-change-transform"></div>
+                    </div>
+
+                    <div id="header-center-scaler" class="relative z-20 flex items-center justify-center">
+                        <button type="button" id="header-center-logo"
+                            class="relative h-full w-full flex items-center justify-center cursor-pointer hover:opacity-95 active:scale-95"
+                            aria-label="Menu Header Center Emblem">
+                            <img src="https://nstarconcepts.com/wp-content/themes/nstar-fullbychild-v4/img/n-logo-headerMenu_lightMode_2.svg"
+                                alt="N Logo"
+                                class="h-auto w-auto object-contain drop-shadow-[0_0_10px_rgba(255,255,255,0.9)]" />
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <div class="flex items-center gap-2">
+                <span
+                    class="px-2.5 py-1 rounded-full bg-blue-50 border border-blue-200/80 font-orbitron font-bold text-[10px] text-blue-emphasis uppercase">
+                    Header UI
+                </span>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Experiential Hero Dial -->
+    <main id="hero-section"
+        class="w-full relative max-h-[87vh] lg:min-h-[96vh] hero-vector-bg flex flex-col items-center justify-between pt-16 sm:pt-20 pb-8 lg:pb-6 2xl:pb-8 overflow-hidden">
+
+        <div class="block lg:hidden z-30 pt-28 px-4 text-center absolute left-1/2 -translate-x-1/2 -translate-y-1/2">
+            <span class="font-orbitron text-[10px] tracking-widest text-dark-polaroid/60 uppercase block">RADIAL
+                NAVIGATION</span>
+        </div>
+
+        <!-- Focused 70% Aspect Ratio Interaction Zone -->
+        <div id="hero-interaction-zone"
+            class="relative w-full max-w-5xl h-[70vh] min-h-[480px] max-h-[760px] flex items-center justify-center my-auto">
+
+            <div id="hero-dial-stage"
+                class="relative w-[300px] h-[300px] sm:w-[330px] sm:h-[330px] lg:w-[400px] lg:h-[400px] 2xl:w-[630px] 2xl:h-[630px] flex items-center justify-center cursor-pointer">
+
+                <div id="flash-effect"
+                    class="absolute inset-0 rounded-full bg-radial from-blue-emphasis/80 via-yellow-emphasis/30 to-transparent opacity-0 pointer-events-none z-40 transition-none">
+                </div>
+
+                <!-- Dynamic Category Title Inside the Hero Circle -->
+                <div id="active-title-display"
+                    class="absolute top-[22%] sm:top-[28%] lg:top-[30%] z-40 text-center pointer-events-none w-full">
+                    <span id="active-category-title"
+                        class="font-orbitron font-black text-sm sm:text-base lg:text-xl tracking-[0.25em] uppercase opacity-0 inline-block text-dark-polaroid drop-shadow-[0_0_15px_rgba(255,255,255,0.95)]">
+                        &nbsp;
+                    </span>
+                </div>
+
+                <div id="outer-hub-ring"
+                    class="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 rounded-full border border-yellow-emphasis/70 pointer-events-none opacity-0 z-10 w-[25rem] h-[25rem] sm:w-[500px] sm:h-[500px] lg:w-[70rem] lg:h-[70rem] 2xl:w-[100rem] 2xl:h-[100rem] drop-shadow-[0_0_12px_rgba(255,234,71,0.6)] will-change-transform">
+                    <div id="apex-indicator-dot"
+                        class="absolute top-0 left-1/2 -translate-x-1/2 -translate-y-1/2 w-3.5 h-3.5 rounded-full bg-yellow-emphasis drop-shadow-[0_0_10px_rgba(255,234,71,1)]">
+                    </div>
+                </div>
+
+                <div id="menu-wheel-wrapper"
+                    class="absolute inset-0 flex items-center justify-center opacity-0 pointer-events-none z-20">
+                    <div id="menu-wheel"
+                        class="relative w-full h-full flex items-center justify-center will-change-transform pointer-events-auto">
+                    </div>
+                </div>
+
+                <div id="center-hub-scaler" class="relative z-30 flex items-center justify-center pointer-events-auto">
+                    <button type="button" id="center-hub"
+                        class="relative w-36 h-36 sm:w-48 sm:h-48 lg:w-[22rem] lg:h-[22rem] 2xl:w-[30rem] 2xl:h-[30rem] flex items-center justify-center group cursor-pointer active:scale-95"
+                        aria-label="Center Radial Logo">
+                        <img src="https://nstarconcepts.com/wp-content/themes/nstar-fullbychild-v4/img/n-logo-headerMenu_darkMode_2.svg"
+                            alt="NStar Concepts Logo"
+                            class="w-full h-full object-contain drop-shadow-[0_0_35px_rgba(255,255,255,0.95)] group-hover:scale-105 transition-transform duration-300" />
+                    </button>
+                </div>
+
+            </div>
+
+        </div>
+
+        <div class="relative z-30 flex flex-col items-center text-center px-4 mb-2 lg:mb-4">
+            <h2
+                class="font-orbitron font-extrabold text-sm sm:text-base tracking-[0.25em] text-dark-polaroid uppercase">
+                CIRCLE MENU <span class="text-blue-emphasis">V.4.5</span>
+            </h2>
+            <p class="font-kanit text-xs sm:text-sm text-dark-polaroid/80 tracking-wide mt-1">
+                <span class="inline-block w-2 h-2 rounded-full bg-blue-emphasis align-middle mr-1.5"></span>
+                Move cursor around the circle to rotate &bull; Hover over dashes to project light beams
             </p>
-        </footer>
-        <!-- Main Stage Canvas -->
-        <div id="stage" class="relative w-[700px] h-[700px] flex items-center justify-center">
-            <!-- Outer Ambient Rings -->
-            <div class="absolute inset-[60px] dial-ticks rounded-full opacity-40 pointer-events-none"></div>
-            <div
-                class="absolute inset-[110px] rounded-full border border-dashed border-emerald-500/20 pointer-events-none">
-            </div>
-            <!-- Green Concentric Perimeter Circle Ring (Diameter 370px, Radius 185px) -->
-            <div class="absolute w-[370px] h-[370px] rounded-full green-perimeter-ring pointer-events-none z-20"></div>
-            <!-- Lightning / Pulse Overlay -->
-            <div id="flash-effect" class="lightning-flash"></div>
-            <!-- ROTATING MENU WHEEL CONTAINER -->
-            <div id="menu-wheel"
-                class="absolute w-[370px] h-[370px] rounded-full flex items-center justify-center transition-none z-20">
-                <!-- 8 Radial Light Beam Items will be generated here -->
-            </div>
-            <!-- CENTER DISPLAY HUB -->
-            <div id="center-hub"
-                class="absolute w-[210px] h-[210px] rounded-full bg-[#070b14]/95 border-2 border-emerald-500/40 backdrop-blur-md shadow-[0_0_50px_rgba(0,0,0,0.9)] flex flex-col items-center justify-center z-30 cursor-pointer group hover:border-neonGreen transition-colors duration-300">
-                <!-- Central Glowing Ring -->
+        </div>
+
+    </main>
+
+    <!-- Live Interaction Output Card -->
+    <section id="demo-output" class="w-full max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-12 lg:py-16">
+        <div
+            class="bg-white rounded-3xl p-6 sm:p-10 shadow-xl border border-gray-100 flex flex-col lg:flex-row items-center justify-between gap-8">
+            <div class="w-full lg:w-1/2 space-y-4">
                 <div
-                    class="absolute inset-2 rounded-full border border-emerald-500/20 group-hover:border-emerald-500/60 transition-colors">
+                    class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-blue-50 text-blue-emphasis font-orbitron text-xs font-bold uppercase">
+                    <span>• Real-Time Selection Status</span>
                 </div>
-                <!-- Logo Top -->
-                <div id="center-logo" class="flex flex-col items-center text-center transition-all duration-300">
-                    <span
-                        class="font-orbitron font-bold text-xs tracking-[0.25em] text-emerald-400/80 uppercase">PORT</span>
-                    <span
-                        class="font-orbitron font-extrabold text-lg tracking-widest text-white drop-shadow-[0_0_8px_rgba(0,255,38,0.5)]">NATHAN</span>
-                    <span class="font-rajdhani text-[10px] tracking-widest text-emerald-500/60 uppercase">.com.br</span>
+                <h2 id="output-heading"
+                    class="font-orbitron font-black text-2xl sm:text-3xl text-dark-polaroid uppercase">
+                    Vector Arts &amp; Concept
+                </h2>
+                <p id="output-description" class="font-kanit text-gray-600 text-sm sm:text-base leading-relaxed">
+                    Original illustrations, UI concept art, and distinctive visual design grounded in modern digital product design.
+                </p>
+                <div class="flex items-center gap-3 pt-2">
+                    <span id="output-index-badge"
+                        class="px-3 py-1 rounded-lg bg-gray-100 font-orbitron text-xs font-bold text-dark-polaroid">
+                        Index: #2 (btIlustra)
+                    </span>
+                    <span id="output-angle-badge"
+                        class="px-3 py-1 rounded-lg bg-gray-100 font-orbitron text-xs font-bold text-dark-polaroid">
+                        Sector Angle: 102.9°
+                    </span>
                 </div>
-                <!-- Active Item Label Display -->
-                <div id="active-label-container"
-                    class="absolute bottom-6 w-full text-center px-2 opacity-0 pointer-events-none transform translate-y-2 transition-all">
-                    <span id="active-label"
-                        class="font-orbitron font-bold text-sm tracking-wider text-neonGreen text-glow uppercase block truncate"></span>
+            </div>
+
+            <div class="w-full lg:w-1/2 grid grid-cols-2 gap-4">
+                <div class="p-5 rounded-2xl bg-slate-50 border border-slate-100 flex flex-col justify-between">
+                    <span class="font-orbitron text-xs font-bold text-gray-400 uppercase">Input Physics</span>
+                    <span class="font-orbitron font-extrabold text-lg text-blue-emphasis mt-2">Smooth Lerp</span>
+                    <span class="font-kanit text-xs text-gray-500 mt-1">0.22 Angular damping</span>
+                </div>
+                <div class="p-5 rounded-2xl bg-slate-50 border border-slate-100 flex flex-col justify-between">
+                    <span class="font-orbitron text-xs font-bold text-gray-400 uppercase">Sector Math</span>
+                    <span class="font-orbitron font-extrabold text-lg text-ns-orange mt-2">51.43° / Arc</span>
+                    <span class="font-kanit text-xs text-gray-500 mt-1">7 Equal radial sectors</span>
+                </div>
+                <div class="p-5 rounded-2xl bg-slate-50 border border-slate-100 flex flex-col justify-between">
+                    <span class="font-orbitron text-xs font-bold text-gray-400 uppercase">Multi-Instance</span>
+                    <span class="font-orbitron font-extrabold text-lg text-green-600 mt-2">Independent Engine</span>
+                    <span class="font-kanit text-xs text-gray-500 mt-1">Complete state isolation</span>
+                </div>
+                <div class="p-5 rounded-2xl bg-slate-50 border border-slate-100 flex flex-col justify-between">
+                    <span class="font-orbitron text-xs font-bold text-gray-400 uppercase">CodePen Ready</span>
+                    <span class="font-orbitron font-extrabold text-lg text-purple-600 mt-2">Zero Build</span>
+                    <span class="font-kanit text-xs text-gray-500 mt-1">Tailwind CDN + GSAP 3</span>
                 </div>
             </div>
         </div>
     </section>
 
-    <!-- Test Section using Tailwind Best Practice Container -->
-    <section class="w-full py-12 px-6">
-        <div class="max-w-7xl mx-auto flex flex-wrap justify-center gap-4">
-            <div class="w-full md:w-3/12 p-8 rounded-2xl order-2 md:order-1 border border-emerald-500/20 bg-[#0c1220]">
-                Something</div>
-            <div class="w-full md:w-5/12 p-8 rounded-2xl order-1 md:order-2 bg-neonGreen text-black font-bold">Hero
-                something</div>
-            <div class="w-full md:w-3/12 p-8 rounded-2xl order-3 md:order-3 border border-emerald-500/20 bg-[#0c1220]">
-                Something</div>
-        </div>
-    </section>
+    <!-- Mobile Fixed Bottom Nav (100% Centered & Independent) -->
+    <nav id="mobile-bottom-nav"
+        class="flex lg:hidden fixed bottom-0 left-0 w-full z-50 bg-white/95 backdrop-blur-md border-t border-gray-200/80 px-4 py-2.5 shadow-[0_-4px_25px_rgba(0,0,0,0.08)] items-center justify-center h-[5rem]">
 
-    <!-- GSAP Script -->
+        <div id="mobile-dock-dial-stage"
+            class="relative w-44 h-44 flex items-center justify-center -mt-20 cursor-pointer mx-auto">
+
+            <div id="mobile-dock-outer-ring"
+                class="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 rounded-full border border-yellow-emphasis/80 pointer-events-none opacity-0 will-change-transform drop-shadow-[0_0_12px_rgba(255,234,71,0.7)] w-[14.5rem] h-[14.5rem]">
+                <div
+                    class="absolute top-0 left-1/2 -translate-x-1/2 -translate-y-1/2 w-3.5 h-3.5 rounded-full bg-yellow-emphasis drop-shadow-[0_0_10px_rgba(255,234,71,1)]">
+                </div>
+            </div>
+
+            <div id="mobile-dock-wheel-wrapper"
+                class="absolute inset-0 flex items-center justify-center opacity-0 scale-95 will-change-transform pointer-events-none">
+                <div id="mobile-dock-wheel"
+                    class="relative w-full h-full flex items-center justify-center will-change-transform pointer-events-auto">
+                </div>
+            </div>
+
+            <div id="mobile-dock-center-scaler" class="relative z-30 flex items-center justify-center">
+                <button type="button" id="mobile-dock-center-logo"
+                    class="relative w-26 h-26 flex items-center justify-center active:scale-95"
+                    aria-label="Mobile Bottom Dial">
+                    <img src="https://nstarconcepts.com/wp-content/themes/nstar-fullbychild-v4/img/n-logo-headerMenu_lightMode_2.svg"
+                        alt="N Logo"
+                        class="w-full h-full object-contain drop-shadow-[0_0_14px_rgba(255,255,255,0.95)]" />
+                </button>
+            </div>
+
+        </div>
+
+    </nav>
+
+    <!-- Footer -->
+    <footer
+        class="w-full bg-white border-t border-gray-200 py-8 px-4 sm:px-6 lg:px-8 text-center font-kanit text-xs sm:text-sm text-gray-500">
+        <div class="max-w-7xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-4">
+            <p>© 2026 <strong class="font-semibold text-dark-polaroid">Natã da Silva Targina</strong> &bull; NStar
+                Concepts. Open-source under MIT License.</p>
+            <div class="flex items-center gap-4 text-dark-polaroid font-orbitron font-bold text-xs uppercase">
+                <a href="https://github.com" target="_blank" rel="noopener noreferrer"
+                    class="hover:text-blue-emphasis transition-colors">GitHub</a>
+                <a href="https://codepen.io/natan314" target="_blank" rel="noopener noreferrer"
+                    class="hover:text-blue-emphasis transition-colors">CodePen</a>
+            </div>
+        </div>
+    </footer>
+
+    <!-- SVG Symbol Definitions (Exact NStar Theme Vector Spec) -->
+    <svg xmlns="http://www.w3.org/2000/svg" class="sr-only">
+        <symbol id="circle-items-desktop" viewBox="0 0 737 737">
+            <circle cx="368.5" cy="368.5" r="358.99" fill="none" stroke="currentColor" stroke-linecap="round"
+                stroke-linejoin="round" stroke-width="3.5" stroke-dasharray="211.43 110.80"
+                transform="rotate(-106.88 368.5 368.5)" />
+        </symbol>
+        <symbol id="circle-item-desktop" viewBox="0 0 737 737">
+            <circle cx="368.5" cy="368.5" r="358.99" fill="none" stroke="currentColor" stroke-linecap="round"
+                stroke-linejoin="round" stroke-width="4.2" stroke-dasharray="211.43 2044.19"
+                transform="rotate(-106.88 368.5 368.5)" />
+        </symbol>
+        <symbol id="circle-items-mobile" viewBox="0 0 360 360">
+            <circle cx="180" cy="180" r="173.92" fill="none" stroke="currentColor" stroke-linecap="round"
+                stroke-linejoin="round" stroke-width="3.5" stroke-dasharray="128.31 27.80"
+                transform="rotate(-111.15 180 180)" />
+        </symbol>
+        <symbol id="circle-item-mobile" viewBox="0 0 360 360">
+            <circle cx="180" cy="180" r="173.92" fill="none" stroke="currentColor" stroke-linecap="round"
+                stroke-linejoin="round" stroke-width="4.2" stroke-dasharray="128.31 964.46"
+                transform="rotate(-111.15 180 180)" />
+        </symbol>
+    </svg>
+
+    <!-- GSAP 3 CDN -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
 
+    <!-- Modular Circular Menu Engine -->
     <script>
         document.addEventListener('DOMContentLoaded', () => {
-            // Menu Items Definition (8 Items based on AS3 source code)
+
             const menuData = [
-                { id: 'btHiper', label: 'WebDesign', title: 'Desenvolvimento Web' },
-                { id: 'btIlustra', label: 'Ilustração', title: 'Artes Vetoriais' },
-                { id: 'btAnima', label: 'Animação', title: 'Motion & FX' },
-                { id: 'btVisu', label: 'Identidade Visual', title: 'Branding & UI' },
-                { id: 'btSobre', label: 'About Me', title: 'Sobre Nathan' },
-                { id: 'btCur', label: 'Hire Me', title: 'Contato Pro' },
-                { id: 'bt6', label: 'Portfolio', title: 'Projetos 3D' },
-                { id: 'bt8', label: 'Contact', title: 'Fale Conosco' }
+                { id: 'btUI', label: 'UI DESIGN', title: 'UI Design Patterns', desc: 'Scalable Design Systems, tactile micro-interactions, and high-fidelity component architecture.', url: 'https://nstarconcepts.com/category/ui-design/' },
+                { id: 'btGraphic', label: 'GRAPHIC DESIGN', title: 'Brand Identity & Modular Grid', desc: 'Typographic hierarchy, negative space balance, and memorable visual consistency.', url: 'https://nstarconcepts.com/category/design-grafico/' },
+                { id: 'btIlustra', label: 'ILLUSTRATION', title: 'Vector Arts & Concept', desc: 'Original vector artwork, interface concept art, and authentic visual storytelling.', url: 'https://nstarconcepts.com/category/ilustracao/' },
+                { id: 'btAnima', label: '2D ANIMATION', title: 'Motion & Micro-interactions', desc: 'Fluid runtime physics animations with 60fps vector precision and expressive motion.', url: 'https://nstarconcepts.com/category/animations2d/' },
+                { id: 'btSobre', label: 'ABOUT', title: 'Creative Engineering', desc: 'Bridging human-centered UX/UI design with modern, high-performance front-end engineering.', url: 'https://nstarconcepts.com/#about-section' },
+                { id: 'btContato', label: 'CONTACT', title: 'Start a Project', desc: 'Bespoke digital experiences, performant user interfaces, and exclusive digital craft.', url: 'https://nstarconcepts.com/#cta-section' },
+                { id: 'btTodos', label: 'ALL POSTS', title: 'Portfolio Overview', desc: 'Explore the complete directory of case studies, interactive prototypes, and design articles.', url: 'https://nstarconcepts.com/all/' }
             ];
 
-            const stage = document.getElementById('stage');
-            const wheel = document.getElementById('menu-wheel');
-            const centerHub = document.getElementById('center-hub');
-            const centerLogo = document.getElementById('center-logo');
-            const activeLabelContainer = document.getElementById('active-label-container');
-            const activeLabel = document.getElementById('active-label');
-            const flashEffect = document.getElementById('flash-effect');
+            const beamImgSrc = 'https://nstarconcepts.com/wp-content/themes/nstar-fullbychild-v4/img/light-beam_lightMode.svg';
 
-            const radius = 185; // Radius of menu circle (370px / 2)
-            const itemCount = menuData.length;
+            class CircularMenuEngine {
+                constructor(options) {
+                    this.options = options;
+                    this.stage = document.getElementById(options.stageId);
+                    this.wheel = document.getElementById(options.wheelId);
+                    this.wheelWrapper = options.wheelWrapperId ? document.getElementById(options.wheelWrapperId) : null;
+                    this.outerRing = options.outerRingId ? document.getElementById(options.outerRingId) : null;
+                    this.label = options.labelId ? document.getElementById(options.labelId) : null;
+                    this.fixedTopLabel = options.fixedTopLabelId ? document.getElementById(options.fixedTopLabelId) : null;
+                    this.flashEffect = options.flashEffectId ? document.getElementById(options.flashEffectId) : null;
+                    this.centerHub = options.centerHubId ? document.getElementById(options.centerHubId) : null;
+                    this.centerHubScaler = options.centerHubScalerId ? document.getElementById(options.centerHubScalerId) : null;
+                    this.triggerArea = options.triggerAreaId ? document.getElementById(options.triggerAreaId) : this.stage;
 
-            // 1. Build Radial Light Beam Items around perimeter ring
-            menuData.forEach((item, index) => {
-                const angleDeg = (index * 360) / itemCount; // 0, 45, 90, 135, 180, 225, 270, 315
-                const angleRad = (angleDeg * Math.PI) / 180;
+                    this.isHero = !!options.isHero;
+                    this.isCompact = !!options.isCompact;
+                    this.isMobileDock = !!options.isMobileDock;
+                    this.onSelect = options.onSelect || null;
 
-                // Base coordinates on circle perimeter relative to center (0,0)
-                const x = radius * Math.cos(angleRad);
-                const y = radius * Math.sin(angleRad);
+                    this.items = options.data || [];
+                    this.itemCount = this.items.length;
+                    this.wheelItems = [];
 
-                // Create Light Beam Container
-                const container = document.createElement('div');
-                container.className = 'beam-item-container';
-                container.setAttribute('data-index', index);
-                container.setAttribute('aria-label', item.label);
+                    this.baseWheelSvg = null;
+                    this.activeArcSvg = null;
 
-                // Position base of SVG container (bottom-center of 54x324 box) at (x, y)
-                // Left = center + x - (54/2)
-                // Top = center + y - 324 (so bottom of container rests at perimeter y)
-                container.style.left = `calc(50% + ${x}px - 27px)`;
-                container.style.top = `calc(50% + ${y}px - 324px)`;
+                    this.currentAngle = 0;
+                    this.targetAngle = 0;
+                    this.lastInputAngle = 0;
+                    this.isTouching = false;
+                    this.isRevealed = false;
+                    this.activeHoverIdx = -1;
+                    this.activeApexIdx = -1; // Starts clean with no pre-selection!
+                    this.isApexLocked = false;
+                    this.hoverLeaveTimer = null;
+                    this.lerpFactor = options.lerpFactor || 0.22;
 
-                // Rotation to point radially outward from center
-                // SVG points UP (0 deg). To point along (cos angleRad, sin angleRad), rotate by (angleDeg + 90 deg)
-                const rotationDeg = angleDeg + 90;
-                container.style.transform = `rotate(${rotationDeg}deg)`;
+                    if (this.stage && this.wheel) {
+                        this.init();
+                    }
+                }
 
-                // SVG Image Element
-                const img = document.createElement('img');
-                img.src = 'light-beam-item.svg';
-                img.alt = item.label;
-                img.className = 'beam-svg-img';
+                // =========================================================================
+                // ⚙️ CUSTOMIZABLE GEOMETRY, LIGHT BEAMS & HIT-TESTING PARAMETERS
+                // =========================================================================
+                // Adjust these parameters to tailor the radius, radial offset, and mouse
+                // sensitivity for any custom layout or responsive breakpoint:
+                // - radius: Radius of the dashed orbital sector circle
+                // - beamRadialOffset: Radial base offset (> 0 pushes outward beyond dash)
+                // - beamHeight: Longitudinal length and reach of the light beam
+                // - beamSVGWidth: Base width of the light beam vector
+                // - hitDistance: Sensitivity radius activating the menu on approach
+                // =========================================================================
+                getDimensions() {
+                    const w = window.innerWidth;
+                    const isDesktop = w >= 1024;
+                    const stageRect = this.stage.getBoundingClientRect();
+                    const stageW = stageRect.width || (this.isCompact ? 176 : (this.isMobileDock ? 176 : (w >= 1536 ? 737 : (w >= 1024 ? 600 : (w >= 640 ? 480 : 340)))));
 
-                // Initial resting state: beam is scaled down (short beam outwards)
-                gsap.set(img, { scaleY: 0.28, scaleX: 0.95 });
+                    if (this.isCompact) {
+                        return {
+                            stageW,
+                            radius: 52,
+                            beamRadialOffset: 2,
+                            dashWidth: 36,
+                            beamSVGWidth: 46,
+                            beamHeight: 52,
+                            hitDistance: 130
+                        };
+                    }
 
-                container.appendChild(img);
-                wheel.appendChild(container);
+                    if (this.isMobileDock) {
+                        return {
+                            stageW,
+                            radius: 78,
+                            beamRadialOffset: 3,
+                            dashWidth: 50,
+                            beamSVGWidth: 92,
+                            beamHeight: 140,
+                            hitDistance: 160
+                        };
+                    }
 
-                // Hover Events for Beams
-                container.addEventListener('mouseenter', () => {
-                    showItemLabel(item.label);
-                    // Expand beam outwards on hover!
-                    gsap.to(img, {
-                        scaleY: 1.15,
-                        scaleX: 1.25,
-                        duration: 0.35,
-                        ease: 'power2.out',
-                        overwrite: 'auto'
+                    const radiusRatio = isDesktop ? (359.07 / 737) : (174.99 / 360);
+                    const radius = Math.round(stageW * radiusRatio);
+
+                    let beamRadialOffset = 3;
+                    let beamHeight = 620;
+                    let hitDistance = 580;
+
+                    if (w >= 1536) {
+                        beamRadialOffset = 4;
+                        beamHeight = 620;
+                        hitDistance = 580;
+                    } else if (w >= 1024) {
+                        beamRadialOffset = 3;
+                        beamHeight = Math.min(Math.round(stageW * 0.95), 560);
+                        hitDistance = Math.min(Math.round(stageW * 0.85), 520);
+                    } else if (w >= 640) {
+                        beamRadialOffset = 4;
+                        beamHeight = 380;
+                        hitDistance = 420;
+                    } else {
+                        beamRadialOffset = 3;
+                        beamHeight = 270;
+                        hitDistance = 300;
+                    }
+
+                    const dashRatio = isDesktop ? (208.41 / 737) : (132.47 / 360);
+                    const dashWidth = Math.round(stageW * dashRatio);
+                    const beamSVGWidth = Math.round(dashWidth * 3.86856);
+
+                    return {
+                        stageW,
+                        radius,
+                        beamRadialOffset,
+                        dashWidth,
+                        beamSVGWidth,
+                        beamHeight,
+                        hitDistance
+                    };
+                }
+
+                build() {
+                    const dims = this.getDimensions();
+                    const { radius, beamSVGWidth, beamHeight, beamRadialOffset } = dims;
+                    this.dimensions = dims;
+
+                    this.wheel.innerHTML = '';
+                    this.wheelItems.length = 0;
+
+                    const isDesktop = window.innerWidth >= 1024;
+                    const baseCircleSymbol = (isDesktop && !this.isCompact && !this.isMobileDock) ? '#circle-items-desktop' : '#circle-items-mobile';
+                    const activeArcSymbol = (isDesktop && !this.isCompact && !this.isMobileDock) ? '#circle-item-desktop' : '#circle-item-mobile';
+                    const viewBox = (isDesktop && !this.isCompact && !this.isMobileDock) ? '0 0 737 737' : '0 0 360 360';
+
+                    this.baseWheelSvg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
+                    this.baseWheelSvg.setAttribute('viewBox', viewBox);
+                    this.baseWheelSvg.setAttribute('class', (this.isCompact || this.isMobileDock)
+                        ? 'base-wheel-svg w-full h-full absolute inset-0 pointer-events-none text-blue-emphasis drop-shadow-[0_0_8px_rgba(0,162,255,0.8)]'
+                        : 'base-wheel-svg w-full h-full absolute inset-0 pointer-events-none text-blue-emphasis drop-shadow-[0_0_12px_rgba(0,162,255,0.8)]');
+
+                    const baseWheelUse = document.createElementNS('http://www.w3.org/2000/svg', 'use');
+                    baseWheelUse.setAttribute('href', baseCircleSymbol);
+                    this.baseWheelSvg.appendChild(baseWheelUse);
+                    this.wheel.appendChild(this.baseWheelSvg);
+
+                    this.activeArcSvg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
+                    this.activeArcSvg.setAttribute('viewBox', viewBox);
+                    const activeArcClass = (this.isCompact || this.isMobileDock)
+                        ? 'active-arc-svg w-full h-full absolute inset-0 pointer-events-none opacity-0 text-ns-orange drop-shadow-[0_0_12px_rgba(255,162,31,0.95)] will-change-transform'
+                        : 'active-arc-svg w-full h-full absolute inset-0 pointer-events-none opacity-0 text-yellow-emphasis drop-shadow-[0_0_25px_rgba(255,234,71,1)] will-change-transform';
+
+                    this.activeArcSvg.setAttribute('class', activeArcClass);
+
+                    const activeArcUse = document.createElementNS('http://www.w3.org/2000/svg', 'use');
+                    activeArcUse.setAttribute('href', activeArcSymbol);
+                    this.activeArcSvg.appendChild(activeArcUse);
+                    this.wheel.appendChild(this.activeArcSvg);
+
+                    this.items.forEach((item, index) => {
+                        const angleDeg = (index * 360) / this.itemCount;
+
+                        const sectorDiv = document.createElement('div');
+                        sectorDiv.className = 'beam-item-sector absolute pointer-events-none';
+                        sectorDiv.style.left = '50%';
+                        sectorDiv.style.top = '50%';
+                        sectorDiv.style.width = '0px';
+                        sectorDiv.style.height = '0px';
+                        sectorDiv.style.transform = `rotate(${angleDeg}deg)`;
+
+                        const anchor = document.createElement('div');
+                        anchor.className = 'dash-beam-anchor absolute pointer-events-none';
+                        anchor.style.left = '0px';
+                        anchor.style.top = `-${radius}px`;
+                        anchor.style.width = '0px';
+                        anchor.style.height = '0px';
+
+                        const beamBox = document.createElement('div');
+                        beamBox.className = 'beam-box absolute pointer-events-none z-10';
+                        beamBox.style.left = `-${beamSVGWidth / 2}px`;
+                        beamBox.style.top = `-${beamHeight + (beamRadialOffset || 0)}px`;
+                        beamBox.style.width = `${beamSVGWidth}px`;
+                        beamBox.style.height = `${beamHeight}px`;
+
+                        const beamImg = document.createElement('img');
+                        beamImg.src = beamImgSrc;
+                        beamImg.alt = item.label;
+                        beamImg.className = 'w-full h-full object-fill opacity-0 drop-shadow-[0_0_35px_rgba(255,247,183,1)] pointer-events-none';
+
+                        beamBox.appendChild(beamImg);
+                        anchor.appendChild(beamBox);
+                        sectorDiv.appendChild(anchor);
+                        this.wheel.appendChild(sectorDiv);
+
+                        const itemObj = {
+                            index,
+                            item,
+                            baseAngle: angleDeg,
+                            beamBox,
+                            beamImg
+                        };
+                        this.wheelItems.push(itemObj);
+
+                        const onEnter = () => {
+                            if (window.innerWidth < 1024) return;
+                            if (!this.isRevealed) this.reveal();
+                            if (this.hoverLeaveTimer) {
+                                clearTimeout(this.hoverLeaveTimer);
+                                this.hoverLeaveTimer = null;
+                            }
+                            if (this.activeHoverIdx !== index) {
+                                this.activeHoverIdx = index;
+                                this.setActiveItem(index);
+                            }
+                        };
+
+                        const onLeave = () => {
+                            if (window.innerWidth < 1024) return;
+                            if (this.hoverLeaveTimer) clearTimeout(this.hoverLeaveTimer);
+                            this.hoverLeaveTimer = setTimeout(() => {
+                                if (this.activeHoverIdx === index) {
+                                    this.activeHoverIdx = -1;
+                                    this.setActiveItem(-1);
+                                    this.hoverLeaveTimer = null;
+                                }
+                            }, 100);
+                        };
+
+                        const onClick = (e) => {
+                            e.stopPropagation();
+                            if (this.flashEffect) {
+                                gsap.fromTo(this.flashEffect, { opacity: 1, scale: 0.8 }, { opacity: 0, scale: 1.3, duration: 0.4 });
+                            }
+                            this.activeHoverIdx = index;
+                            this.setActiveItem(index);
+                            if (typeof this.onSelect === 'function') {
+                                this.onSelect(item, index);
+                            }
+                            if (item && item.url) {
+                                window.open(item.url, '_blank', 'noopener,noreferrer');
+                            }
+                        };
+
+                        beamBox.addEventListener('mouseenter', onEnter);
+                        beamBox.addEventListener('mouseleave', onLeave);
+                        beamBox.addEventListener('click', onClick);
                     });
-                });
 
-                container.addEventListener('mouseleave', () => {
-                    hideItemLabel();
-                    // Retract beam back to resting state
-                    gsap.to(img, {
-                        scaleY: 0.28,
-                        scaleX: 0.95,
-                        duration: 0.4,
-                        ease: 'power2.inOut',
-                        overwrite: 'auto'
+                    this.setActiveItem(-1);
+                }
+
+                setActiveItem(targetIndex) {
+                    const isMobile = window.innerWidth < 1024;
+
+                    if (targetIndex === -1) {
+                        if (this.activeArcSvg) {
+                            if (this.isCompact || this.isMobileDock) {
+                                this.activeArcSvg.style.opacity = '0';
+                            } else {
+                                gsap.to(this.activeArcSvg, { opacity: 0, duration: 0.18, overwrite: 'all' });
+                            }
+                        }
+                        this.wheelItems.forEach((obj) => {
+                            if (obj.beamImg) gsap.to(obj.beamImg, { opacity: 0, duration: 0.18, ease: 'power2.out', overwrite: 'all' });
+                            if (obj.beamBox) obj.beamBox.style.pointerEvents = 'none';
+                        });
+                        if (this.label && this.isRevealed) {
+                            gsap.to(this.label, { opacity: 0, y: isMobile ? -4 : -8, duration: 0.18, ease: 'power2.in', overwrite: 'all' });
+                        }
+                        return;
+                    }
+
+                    if (targetIndex < 0 || targetIndex >= this.itemCount) return;
+                    const wi = this.wheelItems[targetIndex];
+                    if (!wi) return;
+                    const activeItem = wi.item;
+
+                    if (this.activeArcSvg) {
+                        this.activeArcSvg.style.transform = `rotate(${wi.baseAngle}deg)`;
+                        if (this.isCompact || this.isMobileDock) {
+                            this.activeArcSvg.style.opacity = '1';
+                        } else {
+                            gsap.to(this.activeArcSvg, { opacity: 1, duration: 0.2, overwrite: 'all' });
+                        }
+                    }
+
+                    this.wheelItems.forEach((obj, idx) => {
+                        if (idx === targetIndex) {
+                            if (obj.beamBox) {
+                                obj.beamBox.style.pointerEvents = 'auto';
+                            }
+                            if (obj.beamImg) {
+                                gsap.to(obj.beamImg, { opacity: 1, duration: 0.2, ease: 'power2.out', overwrite: 'all' });
+                            }
+                        } else {
+                            if (obj.beamBox) {
+                                obj.beamBox.style.pointerEvents = 'none';
+                            }
+                            if (obj.beamImg) {
+                                gsap.to(obj.beamImg, { opacity: 0, duration: 0.18, ease: 'power2.out', overwrite: 'all' });
+                            }
+                        }
                     });
-                });
 
-                container.addEventListener('click', (e) => handleItemClick(e, item, img));
-            });
+                    if (this.label) {
+                        this.label.textContent = activeItem.label;
+                        if (this.isRevealed) {
+                            gsap.fromTo(this.label, { y: isMobile ? 4 : 8, opacity: 0 }, { y: 0, opacity: 1, duration: 0.22, ease: 'power2.out', overwrite: 'all' });
+                        } else {
+                            gsap.set(this.label, { opacity: 0 });
+                        }
+                    }
 
-            // 2. Continuous Mouse Rotation Engine (AS3 Port)
-            let targetAngle = 0;
-            let currentAngle = 0;
-            let lastMouseAngle = 0;
-            const dragFactor = 0.12; // Smooth lerp coefficient
+                    if (this.fixedTopLabel && isMobile) {
+                        this.fixedTopLabel.textContent = activeItem.label;
+                        if (this.isRevealed) {
+                            gsap.to(this.fixedTopLabel, { opacity: 1, y: 0, duration: 0.25, ease: 'power2.out', overwrite: 'all' });
+                        } else {
+                            gsap.set(this.fixedTopLabel, { opacity: 0, y: -6 });
+                        }
+                    }
 
-            function getStageCenter() {
-                const rect = stage.getBoundingClientRect();
-                return {
-                    x: rect.left + rect.width / 2,
-                    y: rect.top + rect.height / 2
-                };
+                    // Notify live interaction card
+                    if (typeof this.onSelect === 'function') {
+                        this.onSelect(activeItem, targetIndex);
+                    }
+                }
+
+                reveal() {
+                    if (this.isRevealed) return;
+                    this.isRevealed = true;
+                    if (this.outerRing) {
+                        gsap.to(this.outerRing, { opacity: 1, duration: 0.4, ease: 'power2.out', overwrite: 'auto' });
+                    }
+                    if (this.wheelWrapper) {
+                        this.wheelWrapper.style.pointerEvents = 'auto';
+                        gsap.to(this.wheelWrapper, { opacity: 1, scale: 1, duration: 0.4, ease: 'power2.out', overwrite: 'auto' });
+                    }
+                    if (this.centerHubScaler) {
+                        const targetScale = this.isHero ? 0.82 : (this.isCompact ? 0.46 : 0.58);
+                        gsap.to(this.centerHubScaler, { scale: targetScale, duration: 0.4, ease: 'power2.out', overwrite: 'auto' });
+                    }
+                    if (this.label && this.activeHoverIdx >= 0) {
+                        const activeItem = this.items[this.activeHoverIdx];
+                        if (activeItem) this.label.textContent = activeItem.label;
+                        gsap.to(this.label, { opacity: 1, y: 0, duration: 0.25, ease: 'power2.out', overwrite: 'auto' });
+                    }
+                    if (this.fixedTopLabel && window.innerWidth < 1024 && this.activeApexIdx >= 0) {
+                        const activeItem = this.items[this.activeApexIdx];
+                        if (activeItem) this.fixedTopLabel.textContent = activeItem.label;
+                        gsap.to(this.fixedTopLabel, { opacity: 1, y: 0, duration: 0.25, ease: 'power2.out', overwrite: 'auto' });
+                    }
+                }
+
+                hide() {
+                    if (!this.isRevealed) return;
+                    this.isRevealed = false;
+                    this.activeHoverIdx = -1;
+                    this.setActiveItem(-1);
+
+                    if (this.outerRing) {
+                        gsap.to(this.outerRing, { opacity: 0, duration: 0.35, ease: 'power2.in', overwrite: 'auto' });
+                    }
+                    if (this.wheelWrapper) {
+                        this.wheelWrapper.style.pointerEvents = 'none';
+                        gsap.to(this.wheelWrapper, { opacity: 0, scale: 1.05, duration: 0.35, ease: 'power2.in', overwrite: 'auto' });
+                    }
+                    if (this.centerHubScaler) {
+                        const idleScale = this.isMobileDock ? 1.25 : 1.0;
+                        gsap.to(this.centerHubScaler, { scale: idleScale, duration: 0.4, ease: 'power2.out', overwrite: 'auto' });
+                    }
+                    if (this.label) {
+                        gsap.to(this.label, {
+                            opacity: 0, y: -6, duration: 0.2, ease: 'power2.in', overwrite: 'all', onComplete: () => {
+                                if (!this.isRevealed) this.label.innerHTML = '&nbsp;';
+                            }
+                        });
+                    }
+                    if (this.fixedTopLabel && window.innerWidth < 1024) {
+                        gsap.to(this.fixedTopLabel, { opacity: 0, y: -8, duration: 0.2, ease: 'power2.in', overwrite: 'all' });
+                    }
+                }
+
+                getCenter() {
+                    const rect = this.stage.getBoundingClientRect();
+                    return {
+                        x: rect.left + rect.width / 2,
+                        y: rect.top + rect.height / 2
+                    };
+                }
+
+                checkApexAlignment() {
+                    if (!this.isRevealed) return;
+
+                    let closestIdx = -1;
+                    let closestDist = Infinity;
+                    const sectorStep = 360 / this.itemCount;
+
+                    this.wheelItems.forEach((wi, idx) => {
+                        let diffAngle = (wi.baseAngle + (2 * this.currentAngle)) % 360;
+                        let normAngle = ((diffAngle + 540) % 360) - 180;
+                        let dist = Math.abs(normAngle);
+                        if (dist < closestDist) {
+                            closestDist = dist;
+                            closestIdx = idx;
+                        }
+                    });
+
+                    const apexThreshold = this.isApexLocked ? (sectorStep / 2 + 0.5) : 17.5;
+
+                    if (closestDist <= apexThreshold && closestIdx >= 0) {
+                        if (this.activeApexIdx !== closestIdx) {
+                            this.activeApexIdx = closestIdx;
+                            this.setActiveItem(closestIdx);
+                            if (typeof this.onSelect === 'function') {
+                                this.onSelect(this.items[closestIdx], closestIdx);
+                            }
+                        }
+                    } else if (!this.isApexLocked) {
+                        if (this.activeApexIdx !== -1) {
+                            this.activeApexIdx = -1;
+                            this.setActiveItem(-1);
+                        }
+                    }
+                }
+
+                init() {
+                    this.build();
+
+                    if (this.label) {
+                        gsap.set(this.label, { opacity: 0 });
+                        this.label.style.pointerEvents = 'auto';
+                        this.label.style.cursor = 'pointer';
+                        this.label.addEventListener('click', (e) => {
+                            e.stopPropagation();
+                            const targetIdx = this.activeHoverIdx >= 0 ? this.activeHoverIdx : this.activeApexIdx;
+                            if (targetIdx >= 0 && this.items[targetIdx] && this.items[targetIdx].url) {
+                                window.open(this.items[targetIdx].url, '_blank', 'noopener,noreferrer');
+                            }
+                        });
+                    }
+                    if (this.fixedTopLabel) {
+                        gsap.set(this.fixedTopLabel, { opacity: 0 });
+                        this.fixedTopLabel.style.pointerEvents = 'auto';
+                        this.fixedTopLabel.style.cursor = 'pointer';
+                        this.fixedTopLabel.addEventListener('click', (e) => {
+                            e.stopPropagation();
+                            const targetIdx = this.activeHoverIdx >= 0 ? this.activeHoverIdx : this.activeApexIdx;
+                            if (targetIdx >= 0 && this.items[targetIdx] && this.items[targetIdx].url) {
+                                window.open(this.items[targetIdx].url, '_blank', 'noopener,noreferrer');
+                            }
+                        });
+                    }
+                    if (this.centerHubScaler && this.isMobileDock) gsap.set(this.centerHubScaler, { scale: 1.25 });
+
+                    if (this.triggerArea) {
+                        this.triggerArea.addEventListener('mouseenter', () => {
+                            if (window.innerWidth >= 1024) this.reveal();
+                        });
+                        this.triggerArea.addEventListener('mouseleave', () => {
+                            if (window.innerWidth >= 1024) this.hide();
+                        });
+                    }
+
+                    window.addEventListener('mousemove', (e) => {
+                        if (window.innerWidth < 1024) return;
+                        const center = this.getCenter();
+                        const distX = center.x - e.clientX;
+                        const distY = center.y - e.clientY;
+                        const dist = Math.hypot(distX, distY);
+
+                        if (dist < this.dimensions.hitDistance) {
+                            if (!this.isRevealed) this.reveal();
+                            const radians = Math.atan2(distX, distY);
+                            let degrees = (radians * 180) / Math.PI;
+                            let delta = degrees - this.lastInputAngle;
+                            if (delta > 180) delta -= 360;
+                            if (delta < -180) delta += 360;
+                            this.targetAngle += delta * (this.isCompact ? 1.0 : 1.35);
+                            this.lastInputAngle = degrees;
+                        } else if (this.isRevealed && !this.isMobileDock) {
+                            this.hide();
+                        }
+
+                        if (this.isRevealed) {
+                            const ringMin = this.dimensions.radius - (this.isCompact ? 28 : 40);
+                            const ringMax = this.dimensions.radius + (this.isCompact ? 40 : 50);
+                            const isOverDashRing = (dist >= ringMin && dist <= ringMax);
+
+                            if (isOverDashRing) {
+                                const mouseAngleDeg = (Math.atan2(e.clientX - center.x, center.y - e.clientY) * 180 / Math.PI + 360) % 360;
+                                let localAngle = (mouseAngleDeg - this.currentAngle) % 360;
+                                if (localAngle < 0) localAngle += 360;
+
+                                let hitIdx = -1;
+                                this.wheelItems.forEach((wi, idx) => {
+                                    let diff = Math.abs(((localAngle - wi.baseAngle + 540) % 360) - 180);
+                                    if (diff <= (this.isCompact ? 22 : 20)) {
+                                        hitIdx = idx;
+                                    }
+                                });
+
+                                if (hitIdx >= 0) {
+                                    if (this.stage) this.stage.style.cursor = 'pointer';
+                                    if (this.hoverLeaveTimer) {
+                                        clearTimeout(this.hoverLeaveTimer);
+                                        this.hoverLeaveTimer = null;
+                                    }
+                                    if (this.activeHoverIdx !== hitIdx) {
+                                        this.activeHoverIdx = hitIdx;
+                                        this.setActiveItem(hitIdx);
+                                    }
+                                } else {
+                                    if (this.stage) this.stage.style.cursor = 'default';
+                                    if (this.activeHoverIdx !== -1 && !this.hoverLeaveTimer) {
+                                        this.hoverLeaveTimer = setTimeout(() => {
+                                            this.activeHoverIdx = -1;
+                                            this.setActiveItem(-1);
+                                            this.hoverLeaveTimer = null;
+                                        }, 80);
+                                    }
+                                }
+                            } else {
+                                if (this.activeHoverIdx !== -1 && !this.hoverLeaveTimer) {
+                                    this.hoverLeaveTimer = setTimeout(() => {
+                                        this.activeHoverIdx = -1;
+                                        this.setActiveItem(-1);
+                                        this.hoverLeaveTimer = null;
+                                    }, 100);
+                                }
+                            }
+                        }
+                    });
+
+                    if (this.triggerArea) {
+                        this.triggerArea.addEventListener('click', (e) => {
+                            if (window.innerWidth < 1024) return;
+                            const center = this.getCenter();
+                            const distX = center.x - e.clientX;
+                            const distY = center.y - e.clientY;
+                            const dist = Math.hypot(distX, distY);
+                            const ringMin = this.dimensions.radius - (this.isCompact ? 28 : 40);
+                            const ringMax = this.dimensions.radius + (this.isCompact ? 40 : 50);
+
+                            if (dist >= ringMin && dist <= ringMax && this.activeHoverIdx >= 0 && this.wheelItems[this.activeHoverIdx]) {
+                                e.stopPropagation();
+                                const idx = this.activeHoverIdx;
+                                const item = this.items[idx];
+                                if (this.flashEffect) {
+                                    gsap.fromTo(this.flashEffect, { opacity: 1, scale: 0.8 }, { opacity: 0, scale: 1.3, duration: 0.4 });
+                                }
+                                this.setActiveItem(idx);
+                                if (typeof this.onSelect === 'function') {
+                                    this.onSelect(item, idx);
+                                }
+                                if (item && item.url) {
+                                    window.open(item.url, '_blank', 'noopener,noreferrer');
+                                }
+                            }
+                        });
+                    }
+
+                    if (this.triggerArea) {
+                        this.triggerArea.addEventListener('touchstart', (e) => {
+                            if (e.touches.length === 1) {
+                                if (!this.isRevealed) {
+                                    this.reveal();
+                                }
+                                const touch = e.touches[0];
+                                const center = this.getCenter();
+                                const dx = touch.clientX - center.x;
+                                const dy = touch.clientY - center.y;
+                                this.isTouching = true;
+                                this.lastInputAngle = (Math.atan2(dy, dx) * 180) / Math.PI;
+                            }
+                        }, { passive: true });
+
+                        window.addEventListener('touchmove', (e) => {
+                            if (!this.isTouching || e.touches.length !== 1) return;
+                            const touch = e.touches[0];
+                            const center = this.getCenter();
+                            const dx = touch.clientX - center.x;
+                            const dy = touch.clientY - center.y;
+
+                            if (e.cancelable) e.preventDefault();
+                            let currentTouchAngle = (Math.atan2(dy, dx) * 180) / Math.PI;
+                            let delta = currentTouchAngle - this.lastInputAngle;
+                            if (delta > 180) delta -= 360;
+                            if (delta < -180) delta += 360;
+
+                            this.targetAngle += delta;
+                            this.currentAngle = this.targetAngle;
+
+                            this.wheel.style.transform = `rotate(${this.currentAngle}deg)`;
+                            if (this.outerRing) {
+                                this.outerRing.style.transform = `translate(-50%, -50%) rotate(${-this.currentAngle}deg)`;
+                            }
+
+                            this.lastInputAngle = currentTouchAngle;
+                            this.checkApexAlignment();
+                        }, { passive: false });
+
+                        window.addEventListener('touchend', () => {
+                            if (this.isTouching) {
+                                this.isTouching = false;
+                                if (this.activeApexIdx >= 0 && this.wheelItems[this.activeApexIdx]) {
+                                    this.isApexLocked = true;
+                                    const snapTarget = -this.wheelItems[this.activeApexIdx].baseAngle;
+                                    const turns = Math.round((this.targetAngle - snapTarget) / 360);
+                                    this.targetAngle = snapTarget + 360 * turns;
+                                }
+                            }
+                        }, { passive: true });
+                    }
+
+                    if (this.centerHub) {
+                        this.centerHub.addEventListener('click', (e) => {
+                            e.stopPropagation();
+                            if (this.flashEffect) {
+                                gsap.fromTo(this.flashEffect, { opacity: 1, scale: 0.8 }, { opacity: 0, scale: 1.3, duration: 0.4 });
+                            }
+                            if (!this.isRevealed) this.reveal();
+                            else this.hide();
+                        });
+                    }
+
+                    gsap.ticker.add(() => {
+                        if (window.innerWidth >= 1024) {
+                            this.currentAngle += (this.targetAngle - this.currentAngle) * this.lerpFactor;
+                            this.wheel.style.transform = `rotate(${this.currentAngle}deg)`;
+                        } else {
+                            if (!this.isTouching && this.isRevealed) {
+                                this.currentAngle += (this.targetAngle - this.currentAngle) * this.lerpFactor;
+                                this.wheel.style.transform = `rotate(${this.currentAngle}deg)`;
+                                if (this.outerRing) {
+                                    this.outerRing.style.transform = `translate(-50%, -50%) rotate(${-this.currentAngle}deg)`;
+                                }
+                                this.checkApexAlignment();
+                            }
+                        }
+                    });
+
+                    let resizeTimer;
+                    window.addEventListener('resize', () => {
+                        clearTimeout(resizeTimer);
+                        resizeTimer = setTimeout(() => this.build(), 150);
+                    });
+                }
             }
 
-            // Track mouse movement across stage
-            window.addEventListener('mousemove', (e) => {
-                const center = getStageCenter();
-                const distX = center.x - e.clientX;
-                const distY = center.y - e.clientY;
+            const headerMenu = new CircularMenuEngine({
+                stageId: 'header-dial-container',
+                wheelId: 'header-menu-wheel',
+                wheelWrapperId: 'header-wheel-wrapper',
+                labelId: 'header-active-title',
+                centerHubId: 'header-center-logo',
+                centerHubScalerId: 'header-center-scaler',
+                triggerAreaId: 'header-dial-container',
+                isCompact: true,
+                data: menuData
+            });
 
-                const distFromCenter = Math.hypot(distX, distY);
+            const heroOutputHeading = document.getElementById('output-heading');
+            const heroOutputDesc = document.getElementById('output-description');
+            const heroOutputIdxBadge = document.getElementById('output-index-badge');
+            const heroOutputAngleBadge = document.getElementById('output-angle-badge');
 
-                if (distFromCenter < 450) {
-                    const radians = Math.atan2(distX, distY);
-                    let degrees = (radians * 180) / Math.PI;
-
-                    let delta = degrees - lastMouseAngle;
-                    if (delta > 180) delta -= 360;
-                    if (delta < -180) delta += 360;
-
-                    targetAngle += delta;
-                    lastMouseAngle = degrees;
+            const heroMenu = new CircularMenuEngine({
+                stageId: 'hero-dial-stage',
+                wheelId: 'menu-wheel',
+                wheelWrapperId: 'menu-wheel-wrapper',
+                outerRingId: 'outer-hub-ring',
+                centerHubId: 'center-hub',
+                centerHubScalerId: 'center-hub-scaler',
+                flashEffectId: 'flash-effect',
+                triggerAreaId: 'hero-interaction-zone',
+                labelId: 'active-category-title',
+                isHero: true,
+                data: menuData,
+                onSelect: (item, idx) => {
+                    if (heroOutputHeading) {
+                        heroOutputHeading.textContent = item.title;
+                        gsap.fromTo(heroOutputHeading, { opacity: 0.6, y: 4 }, { opacity: 1, y: 0, duration: 0.25, ease: 'power2.out', overwrite: 'auto' });
+                    }
+                    if (heroOutputDesc) {
+                        heroOutputDesc.textContent = item.desc;
+                        gsap.fromTo(heroOutputDesc, { opacity: 0.6, y: 3 }, { opacity: 1, y: 0, duration: 0.25, ease: 'power2.out', overwrite: 'auto' });
+                    }
+                    if (heroOutputIdxBadge) heroOutputIdxBadge.textContent = `Index: #${idx} (${item.id})`;
+                    if (heroOutputAngleBadge) heroOutputAngleBadge.textContent = `Sector Angle: ${(idx * 360 / menuData.length).toFixed(1)}°`;
                 }
             });
 
-            // GSAP Ticker for 60fps smooth physics loop
-            gsap.ticker.add(() => {
-                currentAngle += (targetAngle - currentAngle) * dragFactor;
-
-                // Rotate entire wheel container (light beams rotate concentrically with wheel)
-                wheel.style.transform = `rotate(${currentAngle}deg)`;
+            const mobileDockMenu = new CircularMenuEngine({
+                stageId: 'mobile-dock-dial-stage',
+                wheelId: 'mobile-dock-wheel',
+                wheelWrapperId: 'mobile-dock-wheel-wrapper',
+                outerRingId: 'mobile-dock-outer-ring',
+                centerHubId: 'mobile-dock-center-logo',
+                centerHubScalerId: 'mobile-dock-center-scaler',
+                triggerAreaId: 'mobile-dock-dial-stage',
+                fixedTopLabelId: 'mobile-fixed-top-title',
+                isMobileDock: true,
+                data: menuData,
+                onSelect: (item, idx) => {
+                    if (heroOutputHeading) {
+                        heroOutputHeading.textContent = item.title;
+                        gsap.fromTo(heroOutputHeading, { opacity: 0.6, y: 4 }, { opacity: 1, y: 0, duration: 0.25, ease: 'power2.out', overwrite: 'auto' });
+                    }
+                    if (heroOutputDesc) {
+                        heroOutputDesc.textContent = item.desc;
+                        gsap.fromTo(heroOutputDesc, { opacity: 0.6, y: 3 }, { opacity: 1, y: 0, duration: 0.25, ease: 'power2.out', overwrite: 'auto' });
+                    }
+                    if (heroOutputIdxBadge) heroOutputIdxBadge.textContent = `Index: #${idx} (${item.id})`;
+                    if (heroOutputAngleBadge) heroOutputAngleBadge.textContent = `Sector Angle: ${(idx * 360 / menuData.length).toFixed(1)}°`;
+                }
             });
 
-            // 3. Center Text Display Animations
-            function showItemLabel(label) {
-                activeLabel.textContent = label;
-
-                gsap.to(centerLogo, {
-                    y: -12,
-                    scale: 0.85,
-                    opacity: 0.7,
-                    duration: 0.25,
-                    ease: 'power2.out'
-                });
-
-                gsap.fromTo(activeLabelContainer,
-                    { opacity: 0, y: 15, scale: 0.8 },
-                    { opacity: 1, y: 0, scale: 1, duration: 0.3, ease: 'back.out(1.7)' }
-                );
-            }
-
-            function hideItemLabel() {
-                gsap.to(centerLogo, {
-                    y: 0,
-                    scale: 1,
-                    opacity: 1,
-                    duration: 0.3,
-                    ease: 'power2.out'
-                });
-
-                gsap.to(activeLabelContainer, {
-                    opacity: 0,
-                    y: 10,
-                    duration: 0.2,
-                    ease: 'power2.in'
-                });
-            }
-
-            // Center logo hover effect
-            centerHub.addEventListener('mouseenter', () => showItemLabel('HOME'));
-            centerHub.addEventListener('mouseleave', () => hideItemLabel());
-            centerHub.addEventListener('click', (e) => handleItemClick(e, { label: 'HOME', title: 'Página Inicial' }));
-
-            // 4. Click Electric Flash & Scale Animation
-            function handleItemClick(e, item, imgElem) {
-                e.stopPropagation();
-
-                // Flash overlay
-                gsap.fromTo(flashEffect,
-                    { opacity: 1, scale: 0.8 },
-                    { opacity: 0, scale: 1.2, duration: 0.4, ease: 'power2.out' }
-                );
-
-                // Pulse Stage Center
-                gsap.fromTo(centerHub,
-                    { scale: 0.95 },
-                    { scale: 1, duration: 0.3, ease: 'elastic.out(1.2, 0.4)' }
-                );
-
-                if (imgElem) {
-                    gsap.fromTo(imgElem,
-                        { scaleY: 1.4, scaleX: 1.4 },
-                        { scaleY: 1.15, scaleX: 1.25, duration: 0.4, ease: 'bounce.out' }
-                    );
-                }
-
-                activeLabel.textContent = `▶ ${item.label}`;
-                gsap.fromTo(activeLabel,
-                    { color: '#ffffff' },
-                    { color: '#55E0FF', duration: 0.5 }
-                );
-            }
         });
     </script>
 </body>
