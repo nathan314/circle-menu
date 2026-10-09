@@ -1,0 +1,385 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="robots" content="noindex, nofollow" />
+    <title>Resonate - Animated Circular Menu</title>
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+        href="https://fonts.googleapis.com/css2?family=Orbitron:wght@500;700;900&family=Rajdhani:wght@500;600;700&display=swap"
+        rel="stylesheet" />
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        orbitron: ['Orbitron', 'sans-serif'],
+                        rajdhani: ['Rajdhani', 'sans-serif'],
+                    },
+                    colors: {
+                        neonGreen: '#00FF26',
+                        darkBg: '#05080e',
+                        panelBg: '#0f172a',
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        body {
+            background-color: #05080e;
+            color: #ffffff;
+            font-family: 'Rajdhani', sans-serif;
+            overflow-x: hidden;
+        }
+
+        /* Ambient Glow & Grid */
+        .bg-grid {
+            background-image:
+                radial-gradient(circle at 50% 50%, rgba(0, 255, 38, 0.06) 0%, transparent 60%),
+                linear-gradient(to right, rgba(255, 255, 255, 0.02) 1px, transparent 1px),
+                linear-gradient(to bottom, rgba(255, 255, 255, 0.02) 1px, transparent 1px);
+            background-size: 100% 100%, 40px 40px, 40px 40px;
+        }
+
+        /* Circular Green Perimeter Line */
+        .green-perimeter-ring {
+            border: 1.5px solid #00FF26;
+            box-shadow: 0 0 12px rgba(0, 255, 38, 0.5), inset 0 0 12px rgba(0, 255, 38, 0.2);
+        }
+
+        /* Circular Menu Track Ticks */
+        .dial-ticks {
+            background: repeating-conic-gradient(from 0deg,
+                    rgba(0, 255, 38, 0.3) 0deg 1deg,
+                    transparent 1deg 15deg);
+            mask-image: radial-gradient(circle, transparent 58%, black 60%, black 68%, transparent 70%);
+            -webkit-mask-image: radial-gradient(circle, transparent 58%, black 60%, black 68%, transparent 70%);
+        }
+
+        /* Glow effects */
+        .text-glow {
+            text-shadow: 0 0 12px rgba(0, 255, 38, 0.8), 0 0 25px rgba(0, 255, 38, 0.4);
+        }
+
+        /* Lightning Flash Effect */
+        .lightning-flash {
+            position: absolute;
+            inset: 0;
+            border-radius: 9999px;
+            background: radial-gradient(circle, rgba(0, 255, 38, 0.8) 0%, rgba(85, 224, 255, 0.3) 40%, transparent 70%);
+            pointer-events: none;
+            opacity: 0;
+            z-index: 40;
+        }
+
+        /* Light beam container item */
+        .beam-item-container {
+            position: absolute;
+            width: 54px;
+            height: 324px;
+            pointer-events: auto;
+            cursor: pointer;
+            /* transform-origin at base of beam (bottom center) */
+            transform-origin: 50% 100%;
+        }
+
+        .beam-svg-img {
+            width: 100%;
+            height: 100%;
+            transform-origin: 50% 100%;
+            transition: filter 0.3s ease;
+        }
+
+        .beam-item-container:hover .beam-svg-img {
+            filter: drop-shadow(0 0 18px rgba(255, 250, 93, 0.9)) drop-shadow(0 0 35px rgba(85, 224, 255, 0.8));
+        }
+    </style>
+</head>
+
+<!-- <body class="w-screen h-screen bg-grid flex flex-col items-center justify-center relative overflow-hidden"> -->
+
+<body class="bg-grid relative">
+
+    <!-- Header info -->
+    <section class="w-full h-screen flex flex-col items-center justify-center relative overflow-hidden">
+        <header class="absolute top-6 left-8 z-50 flex items-center gap-3">
+            <div class="w-3 h-3 rounded-full bg-neonGreen animate-pulse"></div>
+            <span class="font-orbitron tracking-widest text-xs text-gray-400 uppercase">Resonate Interactive Dial
+                v2.0</span>
+        </header>
+        <!-- Controls & Instructions overlay -->
+        <footer class="absolute bottom-6 z-50 text-center text-xs text-gray-500 font-rajdhani tracking-wider">
+            <p>MOVA O MOUSE AO REDOR DO CÍRCULO PARA GIRAR O MENU &bull; PASSE O MOUSE NOS FEIXES DE LUZ PARA EXPANDIR
+            </p>
+        </footer>
+        <!-- Main Stage Canvas -->
+        <div id="stage" class="relative w-[700px] h-[700px] flex items-center justify-center">
+            <!-- Outer Ambient Rings -->
+            <div class="absolute inset-[60px] dial-ticks rounded-full opacity-40 pointer-events-none"></div>
+            <div
+                class="absolute inset-[110px] rounded-full border border-dashed border-emerald-500/20 pointer-events-none">
+            </div>
+            <!-- Green Concentric Perimeter Circle Ring (Diameter 370px, Radius 185px) -->
+            <div class="absolute w-[370px] h-[370px] rounded-full green-perimeter-ring pointer-events-none z-20"></div>
+            <!-- Lightning / Pulse Overlay -->
+            <div id="flash-effect" class="lightning-flash"></div>
+            <!-- ROTATING MENU WHEEL CONTAINER -->
+            <div id="menu-wheel"
+                class="absolute w-[370px] h-[370px] rounded-full flex items-center justify-center transition-none z-20">
+                <!-- 8 Radial Light Beam Items will be generated here -->
+            </div>
+            <!-- CENTER DISPLAY HUB -->
+            <div id="center-hub"
+                class="absolute w-[210px] h-[210px] rounded-full bg-[#070b14]/95 border-2 border-emerald-500/40 backdrop-blur-md shadow-[0_0_50px_rgba(0,0,0,0.9)] flex flex-col items-center justify-center z-30 cursor-pointer group hover:border-neonGreen transition-colors duration-300">
+                <!-- Central Glowing Ring -->
+                <div
+                    class="absolute inset-2 rounded-full border border-emerald-500/20 group-hover:border-emerald-500/60 transition-colors">
+                </div>
+                <!-- Logo Top -->
+                <div id="center-logo" class="flex flex-col items-center text-center transition-all duration-300">
+                    <span
+                        class="font-orbitron font-bold text-xs tracking-[0.25em] text-emerald-400/80 uppercase">PORT</span>
+                    <span
+                        class="font-orbitron font-extrabold text-lg tracking-widest text-white drop-shadow-[0_0_8px_rgba(0,255,38,0.5)]">NATHAN</span>
+                    <span class="font-rajdhani text-[10px] tracking-widest text-emerald-500/60 uppercase">.com.br</span>
+                </div>
+                <!-- Active Item Label Display -->
+                <div id="active-label-container"
+                    class="absolute bottom-6 w-full text-center px-2 opacity-0 pointer-events-none transform translate-y-2 transition-all">
+                    <span id="active-label"
+                        class="font-orbitron font-bold text-sm tracking-wider text-neonGreen text-glow uppercase block truncate"></span>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Test Section using Tailwind Best Practice Container -->
+    <section class="w-full py-12 px-6">
+        <div class="max-w-7xl mx-auto flex flex-wrap justify-center gap-4">
+            <div class="w-full md:w-3/12 p-8 rounded-2xl order-2 md:order-1 border border-emerald-500/20 bg-[#0c1220]">
+                Something</div>
+            <div class="w-full md:w-5/12 p-8 rounded-2xl order-1 md:order-2 bg-neonGreen text-black font-bold">Hero
+                something</div>
+            <div class="w-full md:w-3/12 p-8 rounded-2xl order-3 md:order-3 border border-emerald-500/20 bg-[#0c1220]">
+                Something</div>
+        </div>
+    </section>
+
+    <!-- GSAP Script -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            // Menu Items Definition (8 Items based on AS3 source code)
+            const menuData = [
+                { id: 'btHiper', label: 'WebDesign', title: 'Desenvolvimento Web' },
+                { id: 'btIlustra', label: 'Ilustração', title: 'Artes Vetoriais' },
+                { id: 'btAnima', label: 'Animação', title: 'Motion & FX' },
+                { id: 'btVisu', label: 'Identidade Visual', title: 'Branding & UI' },
+                { id: 'btSobre', label: 'About Me', title: 'Sobre Nathan' },
+                { id: 'btCur', label: 'Hire Me', title: 'Contato Pro' },
+                { id: 'bt6', label: 'Portfolio', title: 'Projetos 3D' },
+                { id: 'bt8', label: 'Contact', title: 'Fale Conosco' }
+            ];
+
+            const stage = document.getElementById('stage');
+            const wheel = document.getElementById('menu-wheel');
+            const centerHub = document.getElementById('center-hub');
+            const centerLogo = document.getElementById('center-logo');
+            const activeLabelContainer = document.getElementById('active-label-container');
+            const activeLabel = document.getElementById('active-label');
+            const flashEffect = document.getElementById('flash-effect');
+
+            const radius = 185; // Radius of menu circle (370px / 2)
+            const itemCount = menuData.length;
+
+            // 1. Build Radial Light Beam Items around perimeter ring
+            menuData.forEach((item, index) => {
+                const angleDeg = (index * 360) / itemCount; // 0, 45, 90, 135, 180, 225, 270, 315
+                const angleRad = (angleDeg * Math.PI) / 180;
+
+                // Base coordinates on circle perimeter relative to center (0,0)
+                const x = radius * Math.cos(angleRad);
+                const y = radius * Math.sin(angleRad);
+
+                // Create Light Beam Container
+                const container = document.createElement('div');
+                container.className = 'beam-item-container';
+                container.setAttribute('data-index', index);
+                container.setAttribute('aria-label', item.label);
+
+                // Position base of SVG container (bottom-center of 54x324 box) at (x, y)
+                // Left = center + x - (54/2)
+                // Top = center + y - 324 (so bottom of container rests at perimeter y)
+                container.style.left = `calc(50% + ${x}px - 27px)`;
+                container.style.top = `calc(50% + ${y}px - 324px)`;
+
+                // Rotation to point radially outward from center
+                // SVG points UP (0 deg). To point along (cos angleRad, sin angleRad), rotate by (angleDeg + 90 deg)
+                const rotationDeg = angleDeg + 90;
+                container.style.transform = `rotate(${rotationDeg}deg)`;
+
+                // SVG Image Element
+                const img = document.createElement('img');
+                img.src = 'light-beam-item.svg';
+                img.alt = item.label;
+                img.className = 'beam-svg-img';
+
+                // Initial resting state: beam is scaled down (short beam outwards)
+                gsap.set(img, { scaleY: 0.28, scaleX: 0.95 });
+
+                container.appendChild(img);
+                wheel.appendChild(container);
+
+                // Hover Events for Beams
+                container.addEventListener('mouseenter', () => {
+                    showItemLabel(item.label);
+                    // Expand beam outwards on hover!
+                    gsap.to(img, {
+                        scaleY: 1.15,
+                        scaleX: 1.25,
+                        duration: 0.35,
+                        ease: 'power2.out',
+                        overwrite: 'auto'
+                    });
+                });
+
+                container.addEventListener('mouseleave', () => {
+                    hideItemLabel();
+                    // Retract beam back to resting state
+                    gsap.to(img, {
+                        scaleY: 0.28,
+                        scaleX: 0.95,
+                        duration: 0.4,
+                        ease: 'power2.inOut',
+                        overwrite: 'auto'
+                    });
+                });
+
+                container.addEventListener('click', (e) => handleItemClick(e, item, img));
+            });
+
+            // 2. Continuous Mouse Rotation Engine (AS3 Port)
+            let targetAngle = 0;
+            let currentAngle = 0;
+            let lastMouseAngle = 0;
+            const dragFactor = 0.12; // Smooth lerp coefficient
+
+            function getStageCenter() {
+                const rect = stage.getBoundingClientRect();
+                return {
+                    x: rect.left + rect.width / 2,
+                    y: rect.top + rect.height / 2
+                };
+            }
+
+            // Track mouse movement across stage
+            window.addEventListener('mousemove', (e) => {
+                const center = getStageCenter();
+                const distX = center.x - e.clientX;
+                const distY = center.y - e.clientY;
+
+                const distFromCenter = Math.hypot(distX, distY);
+
+                if (distFromCenter < 450) {
+                    const radians = Math.atan2(distX, distY);
+                    let degrees = (radians * 180) / Math.PI;
+
+                    let delta = degrees - lastMouseAngle;
+                    if (delta > 180) delta -= 360;
+                    if (delta < -180) delta += 360;
+
+                    targetAngle += delta;
+                    lastMouseAngle = degrees;
+                }
+            });
+
+            // GSAP Ticker for 60fps smooth physics loop
+            gsap.ticker.add(() => {
+                currentAngle += (targetAngle - currentAngle) * dragFactor;
+
+                // Rotate entire wheel container (light beams rotate concentrically with wheel)
+                wheel.style.transform = `rotate(${currentAngle}deg)`;
+            });
+
+            // 3. Center Text Display Animations
+            function showItemLabel(label) {
+                activeLabel.textContent = label;
+
+                gsap.to(centerLogo, {
+                    y: -12,
+                    scale: 0.85,
+                    opacity: 0.7,
+                    duration: 0.25,
+                    ease: 'power2.out'
+                });
+
+                gsap.fromTo(activeLabelContainer,
+                    { opacity: 0, y: 15, scale: 0.8 },
+                    { opacity: 1, y: 0, scale: 1, duration: 0.3, ease: 'back.out(1.7)' }
+                );
+            }
+
+            function hideItemLabel() {
+                gsap.to(centerLogo, {
+                    y: 0,
+                    scale: 1,
+                    opacity: 1,
+                    duration: 0.3,
+                    ease: 'power2.out'
+                });
+
+                gsap.to(activeLabelContainer, {
+                    opacity: 0,
+                    y: 10,
+                    duration: 0.2,
+                    ease: 'power2.in'
+                });
+            }
+
+            // Center logo hover effect
+            centerHub.addEventListener('mouseenter', () => showItemLabel('HOME'));
+            centerHub.addEventListener('mouseleave', () => hideItemLabel());
+            centerHub.addEventListener('click', (e) => handleItemClick(e, { label: 'HOME', title: 'Página Inicial' }));
+
+            // 4. Click Electric Flash & Scale Animation
+            function handleItemClick(e, item, imgElem) {
+                e.stopPropagation();
+
+                // Flash overlay
+                gsap.fromTo(flashEffect,
+                    { opacity: 1, scale: 0.8 },
+                    { opacity: 0, scale: 1.2, duration: 0.4, ease: 'power2.out' }
+                );
+
+                // Pulse Stage Center
+                gsap.fromTo(centerHub,
+                    { scale: 0.95 },
+                    { scale: 1, duration: 0.3, ease: 'elastic.out(1.2, 0.4)' }
+                );
+
+                if (imgElem) {
+                    gsap.fromTo(imgElem,
+                        { scaleY: 1.4, scaleX: 1.4 },
+                        { scaleY: 1.15, scaleX: 1.25, duration: 0.4, ease: 'bounce.out' }
+                    );
+                }
+
+                activeLabel.textContent = `▶ ${item.label}`;
+                gsap.fromTo(activeLabel,
+                    { color: '#ffffff' },
+                    { color: '#55E0FF', duration: 0.5 }
+                );
+            }
+        });
+    </script>
+</body>
+
+</html>
