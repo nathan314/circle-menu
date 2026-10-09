@@ -272,7 +272,8 @@
                     Vector Arts &amp; Concept
                 </h2>
                 <p id="output-description" class="font-kanit text-gray-600 text-sm sm:text-base leading-relaxed">
-                    Original illustrations, UI concept art, and distinctive visual design grounded in modern digital product design.
+                    Original illustrations, UI concept art, and distinctive visual design grounded in modern digital
+                    product design.
                 </p>
                 <div class="flex items-center gap-3 pt-2">
                     <span id="output-index-badge"
@@ -321,7 +322,8 @@
                 Multi-Instance Modular Architecture
             </h2>
             <p class="font-kanit text-gray-600 text-sm sm:text-base mt-2">
-                How the encapsulated engine manages multiple independent instances on the same page with high performance and zero build dependencies.
+                How the encapsulated engine manages multiple independent instances on the same page with high
+                performance and zero build dependencies.
             </p>
         </div>
 
@@ -333,7 +335,8 @@
                     01</div>
                 <h3 class="font-orbitron font-bold text-base text-dark-polaroid uppercase">Polar Angular Detection</h3>
                 <p class="font-kanit text-xs sm:text-sm text-gray-600 leading-relaxed">
-                    Instantaneous trigonometric calculation relative to cursor coordinates. Zero initial pre-selection and conflict-free sector mapping.
+                    Instantaneous trigonometric calculation relative to cursor coordinates. Zero initial pre-selection
+                    and conflict-free sector mapping.
                 </p>
             </div>
 
@@ -341,9 +344,11 @@
                 <div
                     class="w-10 h-10 rounded-xl bg-orange-50 text-ns-orange flex items-center justify-center font-orbitron font-bold">
                     02</div>
-                <h3 class="font-orbitron font-bold text-base text-dark-polaroid uppercase">Idle &bull; Active Transition</h3>
+                <h3 class="font-orbitron font-bold text-base text-dark-polaroid uppercase">Idle &bull; Active Transition
+                </h3>
                 <p class="font-kanit text-xs sm:text-sm text-gray-600 leading-relaxed">
-                    In idle state, the center hub rests prominently. On hover or touch, the emblem smoothly contracts and the radial light beams ignite.
+                    In idle state, the center hub rests prominently. On hover or touch, the emblem smoothly contracts
+                    and the radial light beams ignite.
                 </p>
             </div>
 
@@ -353,7 +358,8 @@
                     03</div>
                 <h3 class="font-orbitron font-bold text-base text-dark-polaroid uppercase">Mobile Apex Projection</h3>
                 <p class="font-kanit text-xs sm:text-sm text-gray-600 leading-relaxed">
-                    While dragging the wheel on mobile, the active apex category seamlessly projects onto the screen's top status header.
+                    While dragging the wheel on mobile, the active apex category seamlessly projects onto the screen's
+                    top status header.
                 </p>
             </div>
 
@@ -468,7 +474,7 @@
                 { id: 'btGraphic', label: 'GRAPHIC DESIGN', title: 'Brand Identity & Modular Grid', desc: 'Typographic hierarchy, negative space balance, and memorable visual consistency.', url: 'https://nstarconcepts.com/category/design-grafico/' },
                 { id: 'btIlustra', label: 'ILLUSTRATION', title: 'Vector Arts & Concept', desc: 'Original vector artwork, interface concept art, and authentic visual storytelling.', url: 'https://nstarconcepts.com/category/ilustracao/' },
                 { id: 'btAnima', label: '2D ANIMATION', title: 'Motion & Micro-interactions', desc: 'Fluid runtime physics animations with 60fps vector precision and expressive motion.', url: 'https://nstarconcepts.com/category/animations2d/' },
-                { id: 'btSobre', label: 'ABOUT', title: 'Creative Engineering', desc: 'Bridging human-centered UX/UI design with modern, high-performance front-end engineering.', url: 'https://nstarconcepts.com/#about-section' },
+                { id: 'btSobre', label: 'ABOUT', title: 'Creative Engineering', desc: 'Bridging human-centered UX/UI design with modern, high-performance front-end engineering. Come to know more about me!', url: 'https://nstarconcepts.com/#about-section' },
                 { id: 'btContato', label: 'CONTACT', title: 'Start a Project', desc: 'Bespoke digital experiences, performant user interfaces, and exclusive digital craft.', url: 'https://nstarconcepts.com/#cta-section' },
                 { id: 'btTodos', label: 'ALL POSTS', title: 'Portfolio Overview', desc: 'Explore the complete directory of case studies, interactive prototypes, and design articles.', url: 'https://nstarconcepts.com/all/' }
             ];
@@ -979,13 +985,13 @@
                             this.hide();
                         }
 
-                        // 2. Exact Dash Ring Hit-Testing on Desktop
+                        // 2. Exact Dash Ring & Light Beam Projection Hit-Testing on Desktop
                         if (this.isRevealed) {
                             const ringMin = this.dimensions.radius - (this.isCompact ? 28 : 40);
-                            const ringMax = this.dimensions.radius + (this.isCompact ? 40 : 50);
-                            const isOverDashRing = (dist >= ringMin && dist <= ringMax);
+                            const beamMax = this.dimensions.radius + (this.isCompact ? 50 : this.dimensions.beamHeight + 30);
+                            const isOverInteractiveSector = (dist >= ringMin && dist <= beamMax);
 
-                            if (isOverDashRing) {
+                            if (isOverInteractiveSector) {
                                 const mouseAngleDeg = (Math.atan2(e.clientX - center.x, center.y - e.clientY) * 180 / Math.PI + 360) % 360;
                                 let localAngle = (mouseAngleDeg - this.currentAngle) % 360;
                                 if (localAngle < 0) localAngle += 360;
@@ -993,7 +999,7 @@
                                 let hitIdx = -1;
                                 this.wheelItems.forEach((wi, idx) => {
                                     let diff = Math.abs(((localAngle - wi.baseAngle + 540) % 360) - 180);
-                                    if (diff <= (this.isCompact ? 22 : 20)) {
+                                    if (diff <= (this.isCompact ? 22 : 22)) {
                                         hitIdx = idx;
                                     }
                                 });
@@ -1030,7 +1036,7 @@
                         }
                     });
 
-                    // Stage click sector navigation for desktop
+                    // Stage & Light Beam click navigation for desktop
                     if (this.triggerArea) {
                         this.triggerArea.addEventListener('click', (e) => {
                             if (window.innerWidth < 1024) return;
@@ -1039,9 +1045,9 @@
                             const distY = center.y - e.clientY;
                             const dist = Math.hypot(distX, distY);
                             const ringMin = this.dimensions.radius - (this.isCompact ? 28 : 40);
-                            const ringMax = this.dimensions.radius + (this.isCompact ? 40 : 50);
+                            const beamMax = this.dimensions.radius + (this.isCompact ? 50 : this.dimensions.beamHeight + 30);
 
-                            if (dist >= ringMin && dist <= ringMax && this.activeHoverIdx >= 0 && this.wheelItems[this.activeHoverIdx]) {
+                            if (dist >= ringMin && dist <= beamMax && this.activeHoverIdx >= 0 && this.wheelItems[this.activeHoverIdx]) {
                                 e.stopPropagation();
                                 const idx = this.activeHoverIdx;
                                 const item = this.items[idx];
