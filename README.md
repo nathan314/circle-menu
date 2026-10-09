@@ -2,18 +2,25 @@
 
 > An ultra-modern, high-performance **Circular / Radial Navigation Menu Engine** built with pure Vanilla JavaScript, trigonometric calculus, physics-based rotation inertia, dynamic tangent light beams, and mobile thumb-zone ergonomics.
 
-[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
-[![Engine: Vanilla JS](https://img.shields.io/badge/Engine-Vanilla%20JS%20(ES6+)-blue.svg)](#)
-[![Animation: GSAP 3](https://img.shields.io/badge/Animation-GSAP%203-green.svg)](https://greensock.com/gsap/)
-[![Styling: Tailwind CSS](https://img.shields.io/badge/Styling-Tailwind%20CSS%203-38bdf8.svg)](https://tailwindcss.com/)
+<p align="center">
+  <img src="circlemenu_nstar-concepts_expo-bento-demo.png" alt="Circular Menu UI v.4.5 — Expo Bento Grid Showcase" width="100%" style="border-radius: 12px; box-shadow: 0 12px 36px rgba(0,0,0,0.3);">
+</p>
+
+<p align="center">
+  <a href="https://opensource.org/licenses/MIT"><img src="https://img.shields.io/badge/License-MIT-yellow.svg" alt="License: MIT"></a>
+  <a href="#"><img src="https://img.shields.io/badge/Engine-Vanilla%20JS%20(ES6+)-blue.svg" alt="Engine: Vanilla JS"></a>
+  <a href="https://greensock.com/gsap/"><img src="https://img.shields.io/badge/Animation-GSAP%203-green.svg" alt="Animation: GSAP 3"></a>
+  <a href="https://tailwindcss.com/"><img src="https://img.shields.io/badge/Styling-Tailwind%20CSS%203-38bdf8.svg" alt="Styling: Tailwind CSS"></a>
+</p>
 
 ---
 
 ## ✨ Features & Architecture
 
 - 🎯 **Modular Multi-Instance Engine:** Reusable `CircularMenuEngine` class supporting multiple independent radial menus on the same page (Hero Radial Engine, Floating Header Capsule, Mobile Bottom Docked Nav).
+- 🛡️ **Intelligent Hover Isolation:** Automatic mutual suppression between floating header capsules and background hero menus to prevent overlapping activations.
 - 📐 **Real-Time Trigonometric Angular Tracking:** Pull rotation calculation via `Math.atan2(dx, dy)` and distance proximity check with `Math.hypot(dx, dy)`.
-- ⚡ **Dynamic Tangent Light Beams:** Radial rays aligned tangentially to each dash sector, firing on hover/touch without alpha-blending lag.
+- ⚡ **Dynamic Tangent Light Beams:** Radial rays aligned tangentially to each dash sector, firing on hover/touch without alpha-blending lag. Full-coverage mouse hit-testing for effortless clickability.
 - 📱 **Mobile Thumb-Zone Ergonomics:** Dual counter-rotation engine (`(baseAngle + 2 * currentAngle) % 360 == 0`) with apex locking, haptic pulses, and projected top category labels.
 - 🎨 **Concentric Outer Guide Rings:** Concentric guides with 12 o'clock Apex indicator dots that maintain 100% geometric center during rotation.
 - 🔗 **Direct URL Link Integration:** Built-in support for live links (`target="_blank"`), flash ripple animations, and custom callbacks (`onSelect`).
@@ -26,8 +33,10 @@
 
 | File | Description |
 | :--- | :--- |
+| [`circle-menu.js`](circle-menu.js) | **Standalone Engine Library** — Modular, UMD/Vanilla class managing physics, trigonometry, light beams, and multi-instance lifecycle. |
 | [`index.html`](index.html) | **Main GitHub & Portfolio Edition** — Full responsive showcase with interactive live inspector card, multi-instance navigation, and HUD display. |
 | [`codepen-index.html`](codepen-index.html) | **CodePen Standalone Edition** — 100% self-contained single-file version with inline SVG symbol definitions and zero build tools needed. |
+| [`circlemenu_nstar-concepts_expo-bento-demo.png`](circlemenu_nstar-concepts_expo-bento-demo.png) | **Bento Grid Showcase Preview** — High-resolution desktop, tablet, and mobile interface demonstration. |
 | [`menu-circular.md`](menu-circular.md) | Architectural documentation and component breakdown. |
 | [`COMO_FUNCIONA_MATEMATICA_E_JS.md`](COMO_FUNCIONA_MATEMATICA_E_JS.md) | Mathematical formulas, trigonometry guide, and physics engine explanation (in Portuguese). |
 | `img/` | Vector assets (Light beam SVG, emblem logos, background HUD textures). |
@@ -56,7 +65,7 @@ npx serve .
 
 ## ⚙️ Customization Guide: JavaScript Parameters
 
-All geometric, radial, offset, and hit-testing properties are centralized inside the **`getDimensions()`** method of `CircularMenuEngine`. You can calibrate each parameter to match any visual theme or screen dimension:
+All geometric, radial, offset, and hit-testing properties are centralized inside the **`getDimensions()`** method of `CircularMenuEngine`. You can calibrate each parameter globally or pass overrides directly in options when instantiating the menu:
 
 ```javascript
 getDimensions() {
@@ -71,12 +80,12 @@ getDimensions() {
     if (this.isCompact) {
         return {
             stageW,
-            radius: 52,            // Distance (px) from center to dashes
-            beamRadialOffset: 2,   // Radial push (px) outward from dash edge (> 0 sits flush/outside)
-            dashWidth: 36,         // Base width of the active arc
-            beamSVGWidth: 46,      // Width of the light beam cone
-            beamHeight: 52,        // Longitudinal height/reach of the light beam
-            hitDistance: 130       // Sensitivity radius (px) for cursor activation
+            radius: this.options.radius || 52,            // Distance (px) from center to dashes
+            beamRadialOffset: this.options.beamRadialOffset ?? 2, // Radial push (px) outward from dash edge
+            dashWidth: this.options.dashWidth || 36,         // Base width of the active arc
+            beamSVGWidth: this.options.beamSVGWidth || 96,   // Base width of the light beam cone (full arc span)
+            beamHeight: this.options.beamHeight || 90,       // Longitudinal height/reach of the light beam
+            hitDistance: this.options.hitDistance || 130     // Sensitivity radius (px) for cursor activation
         };
     }
 
@@ -86,12 +95,12 @@ getDimensions() {
     if (this.isMobileDock) {
         return {
             stageW,
-            radius: 78,            // Dash ring radius in the mobile bottom bar
-            beamRadialOffset: 3,   // 3px offset pushing beam base flush outward
-            dashWidth: 50,         // Dash chord width
-            beamSVGWidth: 92,      // Light beam width
-            beamHeight: 140,       // Upward light beam projection reach
-            hitDistance: 160       // Proximity trigger distance
+            radius: this.options.radius || 78,            // Dash ring radius in the mobile bottom bar
+            beamRadialOffset: this.options.beamRadialOffset ?? 3, // Push beam base flush outward
+            dashWidth: this.options.dashWidth || 50,         // Dash chord width
+            beamSVGWidth: this.options.beamSVGWidth || 110,  // Light beam width
+            beamHeight: this.options.beamHeight || 140,      // Upward light beam projection reach
+            hitDistance: this.options.hitDistance || 160     // Proximity trigger distance
         };
     }
 
@@ -102,7 +111,7 @@ getDimensions() {
     const radius = Math.round(stageW * radiusRatio);
 
     // Dynamic responsive calibration for Hero Beam & Interaction Zone
-    let beamRadialOffset = 4; // Positive value keeps beam flush outside perimeter
+    let beamRadialOffset = 3; // Positive value keeps beam flush outside perimeter
     let beamHeight = 620;     // Beam length
     let hitDistance = 580;    // Focused central interaction zone radius (60%~80% hero)
 
@@ -152,9 +161,9 @@ In the HTML markup, the outer ring is centered with `left-1/2 top-1/2 -translate
 ```html
 <!-- Mobile Bottom Outer Ring (Concentric guide with Apex dot) -->
 <div id="mobile-dock-outer-ring"
-    class="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 rounded-full border border-yellow-emphasis/80 pointer-events-none opacity-0 will-change-transform drop-shadow-[0_0_12px_rgba(255,234,71,0.7)] w-[14.5rem] h-[14.5rem]">
+    class="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 rounded-full border border-ns-red/80 pointer-events-none opacity-0 will-change-transform drop-shadow-[0_0_12px_rgba(255,234,71,0.7)] w-[14.5rem] h-[14.5rem]">
     <!-- Upward Apex Indicator Dot (Top 12 o'clock marker) -->
-    <div class="absolute top-0 left-1/2 -translate-x-1/2 -translate-y-1/2 w-3.5 h-3.5 rounded-full bg-yellow-emphasis drop-shadow-[0_0_10px_rgba(255,234,71,1)]">
+    <div class="absolute top-0 left-1/2 -translate-x-1/2 -translate-y-1/2 w-3.5 h-3.5 rounded-full bg-ns-red">
     </div>
 </div>
 ```
@@ -283,6 +292,8 @@ const myCustomMenu = new CircularMenuEngine({
     isHero: false,                          // Enable Hero scale logic
     isCompact: true,                        // Enable compact header capsule logic
     isMobileDock: false,                    // Enable mobile bottom dock logic
+    beamSVGWidth: 96,                       // Custom beam width override (optional)
+    beamHeight: 90,                         // Custom beam reach override (optional)
     lerpFactor: 0.22,                       // Inertia smoothness factor (0.1 = smooth, 0.4 = snappy)
     data: menuData,                         // Item array
     onSelect: (item, index) => {
