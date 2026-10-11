@@ -1,0 +1,440 @@
+<!DOCTYPE html>
+<html lang="en" class="light">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Hero Circle Menu UI — Interactive Radial Engine Showcase</title>
+    <meta name="description"
+        content="Component edition of the Circular Menu UI focused exclusively on the Hero Radial Engine with Inertia Physics and Tangent Light Beams." />
+    <meta name="author" content="Natã da Silva Targina — NStar Concepts" />
+    <meta name="robots" content="index, follow" />
+
+    <!-- Google Fonts: Orbitron, Kanit & Rajdhani -->
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+        href="https://fonts.googleapis.com/css2?family=Kanit:ital,wght@0,300;0,400;0,500;0,600;0,700;1,300;1,400&family=Orbitron:wght@500;600;700;800;900&family=Rajdhani:wght@500;600;700&display=swap"
+        rel="stylesheet" />
+
+    <!-- Tailwind CSS Play CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    fontFamily: {
+                        orbitron: ['Orbitron', 'sans-serif'],
+                        kanit: ['Kanit', 'sans-serif'],
+                        rajdhani: ['Rajdhani', 'sans-serif'],
+                    },
+                    colors: {
+                        'ns-orange': '#FFA21F',
+                        'ns-red': '#FF3B0F',
+                        'blue-emphasis': '#00a2ff',
+                        'yellow-emphasis': '#FFEA47',
+                        'dark-night': '#0a1017',
+                        'dark-polaroid': '#192733',
+                        'dark-card': '#14202b',
+                        'silver-emphasistext-light': '#243242',
+                        'polaroid-light': '#f8fafc',
+                    }
+                }
+            }
+        };
+    </script>
+
+    <style>
+        :root {
+            --blue-emphasis: #00a2ff;
+            --ns-orange: #FFA21F;
+            --ns-red: #FF3B0F;
+            --yellow-emphasis: #FFEA47;
+            --dark-polaroid: #192733;
+            --hightech-light: #99aeba;
+            --polaroid-light: #f8fafc;
+        }
+
+        body {
+            background-color: var(--polaroid-light);
+            color: var(--dark-polaroid);
+            font-family: 'Kanit', sans-serif;
+            overflow-x: hidden;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        /* Hero Background with Official Light Mode Vector Artwork */
+        .hero-vector-bg {
+            background: url('https://nstarconcepts.com/wp-content/themes/nstar-fullbychild-v4/img/bg_footer_lightMode.svg'), linear-gradient(180deg, var(--blue-emphasis) -50%, var(--polaroid-light) 100%);
+            background-size: cover;
+            background-position: center bottom;
+            background-repeat: no-repeat;
+        }
+
+        /* Glassmorphism Capsule */
+        .glass-capsule {
+            background: rgba(255, 255, 255, 0.94);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            border: 1px solid rgba(255, 255, 255, 0.95);
+            box-shadow: 0 10px 30px rgba(0, 162, 255, 0.12), 0 4px 12px rgba(0, 0, 0, 0.04);
+        }
+
+        /* Beam Box Setup */
+        .beam-box {
+            transform-origin: 50% 100%;
+        }
+
+        /* Custom Scrollbar */
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: #e2e8f0;
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: #94a3b8;
+            border-radius: 4px;
+        }
+    </style>
+</head>
+
+<body class="min-h-screen flex flex-col justify-between select-none">
+
+    <!-- ================================================================= -->
+    <!-- 1. CLEAN DESKTOP HEADER (Brand Capsule Navigation - Zero Dial)    -->
+    <!-- ================================================================= -->
+    <header id="desktop-top-header"
+        class="fixed top-8 left-1/2 -translate-x-1/2 z-50 w-full max-w-4xl px-4 pointer-events-none">
+        <div
+            class="w-full glass-capsule h-16 rounded-full px-6 flex items-center justify-between shadow-lg pointer-events-auto relative">
+
+            <!-- Brand Identity / Logo -->
+            <a href="https://nstarconcepts.com" target="_blank" rel="noopener noreferrer"
+                class="flex items-center gap-3 hover:opacity-85 transition-opacity group">
+                <img src="https://nstarconcepts.com/wp-content/themes/nstar-fullbychild-v4/img/n-logo-headerMenu_lightMode_2.svg"
+                    alt="NStar Concepts"
+                    class="h-7 w-auto object-contain drop-shadow-[0_0_8px_rgba(0,162,255,0.4)] group-hover:scale-105 transition-transform" />
+                <span class="font-orbitron font-extrabold text-xs tracking-[0.2em] text-dark-polaroid uppercase">
+                    NSTAR CONCEPTS
+                </span>
+            </a>
+
+            <!-- Navigation Links -->
+            <nav
+                class="hidden sm:flex items-center gap-5 text-xs font-orbitron font-bold uppercase tracking-wider text-dark-polaroid/70">
+                <a href="#hero-section" class="hover:text-blue-emphasis transition-colors">Radial Dial</a>
+                <a href="#docs-section" class="hover:text-blue-emphasis transition-colors">API Docs</a>
+                <a href="https://nstarconcepts.com/all/" target="_blank" rel="noopener noreferrer"
+                    class="hover:text-blue-emphasis transition-colors">Portfolio</a>
+            </nav>
+
+            <!-- Right Component Badge -->
+            <div class="flex items-center gap-2">
+                <span
+                    class="px-2.5 py-1 rounded-full bg-blue-50 border border-blue-200/80 font-orbitron font-bold text-[10px] text-blue-emphasis uppercase">
+                    Hero Engine
+                </span>
+            </div>
+
+        </div>
+    </header>
+
+    <!-- ================================================================= -->
+    <!-- 2. HERO SHOWCASE SECTION (Radial Interactive Engine)              -->
+    <!-- ================================================================= -->
+    <main id="hero-section"
+        class="w-full relative max-h-[87vh] lg:min-h-[96vh] hero-vector-bg flex flex-col items-center justify-between pt-24 sm:pt-28 pb-8 lg:pb-6 2xl:pb-8 overflow-hidden">
+
+        <!-- Mobile Top In-Flow Title Display -->
+        <div class="block lg:hidden z-30 pt-16 px-4 text-center absolute left-1/2 -translate-x-1/2 -translate-y-1/2">
+            <span class="font-orbitron text-[10px] tracking-widest text-dark-polaroid/60 uppercase block">RADIAL
+                NAVIGATION</span>
+        </div>
+
+        <!-- Dedicated Interaction Zone (Approx 70% Aspect Ratio for responsive startup) -->
+        <div id="hero-interaction-zone"
+            class="relative w-full max-w-5xl h-[70vh] min-h-[480px] max-h-[760px] flex items-center justify-center my-auto">
+
+            <!-- Central Radial Dial Stage Container -->
+            <div id="hero-dial-stage"
+                class="relative w-[300px] h-[300px] sm:w-[330px] sm:h-[330px] lg:w-[400px] lg:h-[400px] 2xl:w-[630px] 2xl:h-[630px] flex items-center justify-center cursor-pointer">
+
+                <!-- Lightning Flash Overlay on Selection -->
+                <div id="flash-effect"
+                    class="absolute inset-0 rounded-full bg-radial from-blue-emphasis/80 via-yellow-emphasis/30 to-transparent opacity-0 pointer-events-none z-40 transition-none">
+                </div>
+
+                <!-- Dynamic Category Title Display (INSIDE THE HERO CIRCLE) -->
+                <div id="active-title-display"
+                    class="absolute top-[22%] sm:top-[28%] lg:top-[25%] 2xl:top-[30%] z-40 text-center pointer-events-none w-full">
+                    <span id="active-category-title"
+                        class="font-orbitron font-black text-sm sm:text-base lg:text-xl tracking-[0.25em] uppercase opacity-0 inline-block text-dark-polaroid drop-shadow-[0_0_15px_rgba(255,255,255,0.95)]">
+                        &nbsp;
+                    </span>
+                </div>
+
+                <!-- Concentric Indicative Outer Hub Ring (Large outer guide with Apex Dot at 12 o'clock) -->
+                <div id="outer-hub-ring"
+                    class="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 rounded-full border border-yellow-emphasis/70 pointer-events-none opacity-0 z-10 w-[25rem] h-[25rem] sm:w-[500px] sm:h-[500px] lg:w-[70rem] lg:h-[70rem] 2xl:w-[100rem] 2xl:h-[100rem] drop-shadow-[0_0_12px_rgba(255,234,71,0.6)] will-change-transform">
+                    <!-- Glowing Apex Indicator Dot (Top 12 o'clock marker) -->
+                    <div id="apex-indicator-dot"
+                        class="absolute top-0 left-1/2 -translate-x-1/2 -translate-y-1/2 w-3.5 h-3.5 rounded-full bg-yellow-emphasis drop-shadow-[0_0_10px_rgba(255,234,71,1)]">
+                    </div>
+                </div>
+
+                <!-- Rotating Menu Wheel Wrapper (Fades in on Hero hover / touch) -->
+                <div id="menu-wheel-wrapper"
+                    class="absolute inset-0 flex items-center justify-center opacity-0 pointer-events-none z-20">
+                    <!-- Inner Wheel (Base Wheel SVG + Active Arc SVG + 7 Tangent Light Beams) -->
+                    <div id="menu-wheel"
+                        class="relative w-full h-full flex items-center justify-center will-change-transform pointer-events-auto">
+                    </div>
+                </div>
+
+                <!-- Center Display Hub (Official N Logo with Energy Ring) -->
+                <div id="center-hub-scaler" class="relative z-30 flex items-center justify-center pointer-events-auto">
+                    <button type="button" id="center-hub"
+                        class="relative w-68 h-68 lg:w-[22rem] lg:h-[22rem] 2xl:w-[30rem] 2xl:h-[30rem] flex items-center justify-center group cursor-pointer active:scale-95"
+                        aria-label="Center Radial Logo">
+                        <img src="https://nstarconcepts.com/wp-content/themes/nstar-fullbychild-v4/img/n-logo-headerMenu_darkMode_2.svg"
+                            alt="NStar Concepts Logo"
+                            class="w-full h-full object-contain drop-shadow-[0_0_35px_rgba(255,255,255,0.95)] group-hover:scale-105 transition-transform duration-300" />
+                    </button>
+                </div>
+
+            </div>
+
+        </div>
+
+        <!-- Hero Sub-Bar: Title & Instructions -->
+        <div class="relative z-30 flex flex-col items-center text-center px-4 mb-2 lg:mb-4">
+            <h2
+                class="font-orbitron font-extrabold text-sm sm:text-base tracking-[0.25em] text-dark-polaroid uppercase">
+                HERO RADIAL ENGINE <span class="text-blue-emphasis">V.4.5</span>
+            </h2>
+            <p class="font-kanit text-xs sm:text-sm text-dark-polaroid/80 tracking-wide mt-1">
+                Hover anywhere near the dial or drag horizontally to rotate sectors & trigger tangent light beams.
+            </p>
+        </div>
+
+    </main>
+
+    <!-- ================================================================= -->
+    <!-- 3. LIVE INTERACTION & OUTPUT PREVIEW SECTION                      -->
+    <!-- ================================================================= -->
+    <section class="w-full max-w-5xl mx-auto px-4 py-8">
+        <div id="demo-output"
+            class="glass-capsule rounded-3xl p-6 sm:p-8 border border-white/80 shadow-xl transition-all duration-300">
+            <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-4">
+                <div>
+                    <span
+                        class="px-2.5 py-1 rounded-md bg-blue-100 text-blue-700 font-orbitron font-bold text-xs uppercase tracking-wider">
+                        Active Selection Inspector
+                    </span>
+                    <h3 id="output-heading"
+                        class="font-orbitron font-black text-xl sm:text-2xl text-dark-polaroid uppercase tracking-wider mt-2">
+                        Interactive Radial Interface Ready
+                    </h3>
+                </div>
+                <div class="flex items-center gap-2">
+                    <span id="output-index-badge"
+                        class="px-3 py-1 rounded-full bg-slate-100 border border-slate-200 text-slate-700 font-orbitron font-semibold text-xs">
+                        Idle: Awaiting Hover / Touch
+                    </span>
+                    <span id="output-angle-badge"
+                        class="px-3 py-1 rounded-full bg-slate-100 border border-slate-200 text-slate-700 font-orbitron font-semibold text-xs">
+                        Angle: 0.0°
+                    </span>
+                </div>
+            </div>
+            <p id="output-description"
+                class="text-slate-600 text-sm sm:text-base font-kanit font-normal leading-relaxed">
+                Interact with the central radial dial above on desktop via mouse proximity or on mobile via touch drag
+                to explore 7 creative sectors, tangent light beams, physics inertia, and direct links to portfolio
+                categories.
+            </p>
+        </div>
+    </section>
+
+    <!-- ================================================================= -->
+    <!-- 4. COMPONENT ARCHITECTURE & DOCUMENTATION GRID                    -->
+    <!-- ================================================================= -->
+    <section id="docs-section" class="w-full max-w-5xl mx-auto px-4 py-8">
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+
+            <!-- Card 1 -->
+            <div class="glass-capsule p-6 rounded-2xl border border-white/80 shadow-md">
+                <div
+                    class="w-10 h-10 rounded-xl bg-blue-500/10 flex items-center justify-center text-blue-emphasis mb-4">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <circle cx="12" cy="12" r="9" stroke-width="2" />
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 7v5l3 3" />
+                    </svg>
+                </div>
+                <h4 class="font-orbitron font-bold text-dark-polaroid text-sm uppercase tracking-wider mb-2">
+                    Gamer Proximity Physics
+                </h4>
+                <p class="font-kanit text-xs text-slate-600 leading-relaxed">
+                    Uses calibrated mouse proximity (60-80% hero interaction zone) to calculate angular displacement and
+                    deliver seamless inertia pulling rotation.
+                </p>
+            </div>
+
+            <!-- Card 2 -->
+            <div class="glass-capsule p-6 rounded-2xl border border-white/80 shadow-md">
+                <div
+                    class="w-10 h-10 rounded-xl bg-yellow-500/10 flex items-center justify-center text-yellow-500 mb-4">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                            d="M13 10V3L4 14h7v7l9-11h-7z" />
+                    </svg>
+                </div>
+                <h4 class="font-orbitron font-bold text-dark-polaroid text-sm uppercase tracking-wider mb-2">
+                    Tangent Light Beams
+                </h4>
+                <p class="font-kanit text-xs text-slate-600 leading-relaxed">
+                    Accurately projects vector light beams outward from each sector arc with <code
+                        class="bg-slate-100 px-1 py-0.5 rounded text-[11px]">beamRadialOffset: 4</code> for seamless
+                    visual alignment.
+                </p>
+            </div>
+
+            <!-- Card 3 -->
+            <div class="glass-capsule p-6 rounded-2xl border border-white/80 shadow-md">
+                <div class="w-10 h-10 rounded-xl bg-orange-500/10 flex items-center justify-center text-ns-orange mb-4">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                            d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zM14 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z" />
+                    </svg>
+                </div>
+                <h4 class="font-orbitron font-bold text-dark-polaroid text-sm uppercase tracking-wider mb-2">
+                    Clean Standalone Bundle
+                </h4>
+                <p class="font-kanit text-xs text-slate-600 leading-relaxed">
+                    Pure zero-overhead code package in <code
+                        class="bg-slate-100 px-1 py-0.5 rounded text-[11px]">circle-menu-hero.js</code>. Ready to drop
+                    into your custom landing page or portfolio.
+                </p>
+            </div>
+
+        </div>
+    </section>
+
+    <!-- ================================================================= -->
+    <!-- 5. FOOTER & CREDITS                                               -->
+    <!-- ================================================================= -->
+    <footer class="w-full bg-white/60 border-t border-slate-200/80 py-6 px-4 mt-auto">
+        <div class="max-w-5xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-4">
+            <p class="font-kanit text-xs text-slate-500 text-center sm:text-left">
+                Crafted with passion by <strong class="text-dark-polaroid">Natã da Silva Targina</strong> — NStar
+                Concepts
+                © 2026. Released under the MIT License.
+            </p>
+            <div class="flex items-center gap-4 text-dark-polaroid font-orbitron font-bold text-xs uppercase">
+                <a href="https://github.com" target="_blank" rel="noopener noreferrer"
+                    class="hover:text-blue-emphasis transition-colors">GitHub</a>
+                <a href="https://codepen.io/natan314" target="_blank" rel="noopener noreferrer"
+                    class="hover:text-blue-emphasis transition-colors">CodePen</a>
+                <a href="https://www.linkedin.com/in/nstargina/" target="_blank" rel="noopener noreferrer"
+                    class="hover:text-blue-emphasis transition-colors">LinkedIn</a>
+            </div>
+        </div>
+    </footer>
+
+    <!-- ================================================================= -->
+    <!-- SVG SYMBOL DEFINITIONS (Exact architecture of NStar Theme)        -->
+    <!-- ================================================================= -->
+    <svg xmlns="http://www.w3.org/2000/svg" class="sr-only">
+        <!-- Desktop 7 Unified Sectors (Radius: 358.99, ViewBox: 737x737) -->
+        <symbol id="circle-items-desktop" viewBox="0 0 737 737">
+            <circle cx="368.5" cy="368.5" r="358.99" fill="none" stroke="currentColor" stroke-linecap="round"
+                stroke-linejoin="round" stroke-width="3.5" stroke-dasharray="211.43 110.80"
+                transform="rotate(-106.88 368.5 368.5)" />
+        </symbol>
+        <!-- Desktop Active Arc Highlight -->
+        <symbol id="circle-item-desktop" viewBox="0 0 737 737">
+            <circle cx="368.5" cy="368.5" r="358.99" fill="none" stroke="currentColor" stroke-linecap="round"
+                stroke-linejoin="round" stroke-width="4.2" stroke-dasharray="211.43 2044.19"
+                transform="rotate(-106.88 368.5 368.5)" />
+        </symbol>
+        <!-- Mobile 7 Unified Sectors (Radius: 173.92, ViewBox: 360x360) -->
+        <symbol id="circle-items-mobile" viewBox="0 0 360 360">
+            <circle cx="180" cy="180" r="173.92" fill="none" stroke="currentColor" stroke-linecap="round"
+                stroke-linejoin="round" stroke-width="3.5" stroke-dasharray="128.31 27.80"
+                transform="rotate(-111.15 180 180)" />
+        </symbol>
+        <!-- Mobile Active Arc Highlight -->
+        <symbol id="circle-item-mobile" viewBox="0 0 360 360">
+            <circle cx="180" cy="180" r="173.92" fill="none" stroke="currentColor" stroke-linecap="round"
+                stroke-linejoin="round" stroke-width="4.2" stroke-dasharray="128.31 964.46"
+                transform="rotate(-111.15 180 180)" />
+        </symbol>
+    </svg>
+
+    <!-- GSAP 3 CDN -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
+
+    <!-- Hero Radial Menu Engine (Standalone Component Library) -->
+    <script src="circle-menu-hero.js"></script>
+
+    <!-- ================================================================= -->
+    <!-- INITIALIZE HERO RADIAL MENU COMPONENT                             -->
+    <!-- ================================================================= -->
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+
+            // Shared Data Schema (With live URLs to nstarconcepts.com)
+            const menuData = [
+                { id: 'btUI', label: 'UI DESIGN', title: 'UI Design Patterns', desc: 'Scalable Design Systems, tactile micro-interactions, and high-fidelity component architecture.', url: 'https://nstarconcepts.com/category/ui-design/' },
+                { id: 'btGraphic', label: 'GRAPHIC DESIGN', title: 'Brand Identity & Modular Grid', desc: 'Typographic hierarchy, negative space balance, and memorable visual consistency.', url: 'https://nstarconcepts.com/category/design-grafico/' },
+                { id: 'btIlustra', label: 'ILLUSTRATION', title: 'Vector Arts & Concept', desc: 'Original vector artwork, interface concept art, and authentic visual storytelling.', url: 'https://nstarconcepts.com/category/ilustracao/' },
+                { id: 'btAnima', label: '2D ANIMATION', title: 'Motion & Micro-interactions', desc: 'Fluid runtime physics animations with 60fps vector precision and expressive motion.', url: 'https://nstarconcepts.com/category/animations2d/' },
+                { id: 'btSobre', label: 'ABOUT', title: 'Creative Engineering', desc: 'Bridging human-centered UX/UI design with modern, high-performance front-end engineering. Come to know more about me!', url: 'https://nstarconcepts.com/#about-section' },
+                { id: 'btContato', label: 'CONTACT', title: 'Start a Project', desc: 'Bespoke digital experiences, performant user interfaces, and exclusive digital craft.', url: 'https://nstarconcepts.com/#cta-section' },
+                { id: 'btTodos', label: 'ALL POSTS', title: 'Portfolio Overview', desc: 'Explore the complete directory of case studies, interactive prototypes, and design articles.', url: 'https://nstarconcepts.com/all/' }
+            ];
+
+            const heroOutputHeading = document.getElementById('output-heading');
+            const heroOutputDesc = document.getElementById('output-description');
+            const heroOutputIdxBadge = document.getElementById('output-index-badge');
+            const heroOutputAngleBadge = document.getElementById('output-angle-badge');
+
+            // Initialize Standalone Hero Radial Menu Engine
+            const heroMenu = new HeroCircleMenuEngine({
+                stageId: 'hero-dial-stage',
+                wheelId: 'menu-wheel',
+                wheelWrapperId: 'menu-wheel-wrapper',
+                outerRingId: 'outer-hub-ring',
+                centerHubId: 'center-hub',
+                centerHubScalerId: 'center-hub-scaler',
+                flashEffectId: 'flash-effect',
+                triggerAreaId: 'hero-interaction-zone', // Focused 70% aspect ratio interaction zone
+                labelId: 'active-category-title',
+                data: menuData,
+                onSelect: (item, idx) => {
+                    if (heroOutputHeading) {
+                        heroOutputHeading.textContent = item.title;
+                        if (typeof gsap !== 'undefined') {
+                            gsap.fromTo(heroOutputHeading, { opacity: 0.6, y: 4 }, { opacity: 1, y: 0, duration: 0.25, ease: 'power2.out', overwrite: 'auto' });
+                        }
+                    }
+                    if (heroOutputDesc) {
+                        heroOutputDesc.textContent = item.desc;
+                        if (typeof gsap !== 'undefined') {
+                            gsap.fromTo(heroOutputDesc, { opacity: 0.6, y: 3 }, { opacity: 1, y: 0, duration: 0.25, ease: 'power2.out', overwrite: 'auto' });
+                        }
+                    }
+                    if (heroOutputIdxBadge) heroOutputIdxBadge.textContent = `Index: #${idx} (${item.id})`;
+                    if (heroOutputAngleBadge) heroOutputAngleBadge.textContent = `Sector Angle: ${(idx * 360 / menuData.length).toFixed(1)}°`;
+                }
+            });
+
+        });
+    </script>
+</body>
+
+</html>

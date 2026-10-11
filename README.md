@@ -16,9 +16,22 @@
 
 ---
 
+## 📦 Componentized Architecture & Available Formats
+
+To give developers and designers maximum flexibility, this project is delivered in **two independent, standalone component bundles** alongside the complete multi-instance showcase:
+
+| Component / Format | HTML File | JavaScript File | Description |
+| :--- | :--- | :--- | :--- |
+| **Complete Showcase** (Multi-Instance) | [`index.html`](index.html) | [`circle-menu.js`](circle-menu.js) | Full experiential showcase combining the Desktop Header Capsule, the Hero Radial Engine, and the Mobile Dock in a single interconnected page. |
+| **Header Component** (Standalone) | [`header-circle-menu.html`](header-circle-menu.html) | [`circle-menu-header.js`](circle-menu-header.js) | Isolated, zero-overhead component featuring the **Floating Header Capsule** (Desktop) morphing into the **Centered Bottom Thumb-Zone Dock** (Mobile) with top screen apex projection. Zero hero radial menu dependencies. |
+| **Hero Component** (Standalone) | [`hero-circle-menu.html`](hero-circle-menu.html) | [`circle-menu-hero.js`](circle-menu-hero.js) | Isolated, zero-overhead component featuring the **Hero Radial Engine** with physics-based inertia rotation, tangent light beams, and interactive output card. Zero header dial dependencies. |
+| **CodePen Edition** (Single-File) | [`codepen-index.html`](codepen-index.html) | *Inline Script* | 100% self-contained single-file edition ready to copy and paste into CodePen with inline SVG symbols. |
+
+---
+
 ## ✨ Features & Architecture
 
-- 🎯 **Modular Multi-Instance Engine:** Reusable `CircularMenuEngine` class supporting multiple independent radial menus on the same page (Hero Radial Engine, Floating Header Capsule, Mobile Bottom Docked Nav).
+- 🎯 **Modular Zero-Overhead Components:** Choose between standalone Header Capsule, standalone Hero Radial Engine, or both together. No need to clean up unused code!
 - 🛡️ **Intelligent Hover Isolation:** Automatic mutual suppression between floating header capsules and background hero menus to prevent overlapping activations.
 - 📐 **Real-Time Trigonometric Angular Tracking:** Pull rotation calculation via `Math.atan2(dx, dy)` and distance proximity check with `Math.hypot(dx, dy)`.
 - ⚡ **Dynamic Tangent Light Beams:** Radial rays aligned tangentially to each dash sector, firing on hover/touch without alpha-blending lag. Full-coverage mouse hit-testing for effortless clickability.
@@ -30,43 +43,88 @@
 
 ---
 
-## 📂 File Structure
+## 📂 File Directory
 
-| File | Description |
-| :--- | :--- |
-| [`circle-menu.js`](circle-menu.js) | **Standalone Engine Library** — Modular, UMD/Vanilla class managing physics, trigonometry, light beams, and multi-instance lifecycle. |
-| [`index.html`](index.html) | **Main GitHub & Portfolio Edition** — Full responsive showcase with interactive live inspector card, multi-instance navigation, and HUD display. |
-| [`codepen-index.html`](codepen-index.html) | **CodePen Standalone Edition** — 100% self-contained single-file version with inline SVG symbol definitions and zero build tools needed. |
-| [`circlemenu_nstar-concepts_expo-bento-demo.png`](circlemenu_nstar-concepts_expo-bento-demo.png) | **Bento Grid Showcase Preview** — High-resolution desktop, tablet, and mobile interface demonstration. |
-| [`menu-circular.md`](menu-circular.md) | Architectural documentation and component breakdown. |
-| [`COMO_FUNCIONA_MATEMATICA_E_JS.md`](COMO_FUNCIONA_MATEMATICA_E_JS.md) | Mathematical formulas, trigonometry guide, and physics engine explanation (in Portuguese). |
-| `img/` | Vector assets (Light beam SVG, emblem logos, background HUD textures). |
+```
+circle-menu/
+├── index.html                   # Combined Multi-Instance Showcase (Header + Hero + Mobile Dock)
+├── circle-menu.js               # Multi-Instance Universal JavaScript Engine
+│
+├── header-circle-menu.html      # [COMPONENT 1] Standalone Header & Mobile Dock Showcase
+├── circle-menu-header.js        # [COMPONENT 1] Dedicated JS Engine for Header Capsule & Mobile Dock
+│
+├── hero-circle-menu.html        # [COMPONENT 2] Standalone Hero Radial Engine Showcase
+├── circle-menu-hero.js          # [COMPONENT 2] Dedicated JS Engine for Hero Radial Navigation
+│
+├── codepen-index.html           # Standalone Single-File Copy-Paste Edition for CodePen
+├── README.md                    # Complete Architecture and API Documentation
+├── COMO_FUNCIONA_MATEMATICA_E_JS.md # Trigonometry, Calculus & Physics Technical Manual
+├── circlemenu_nstar-concepts_expo-bento-demo.png # Showcase Preview Banner
+└── LICENSE                      # MIT Open Source License
+```
 
 ---
 
-## 🚀 Quick Start
+## 🚀 Quick Start: Using the Independent Components
 
-### 1. Run Locally
-Open [`index.html`](index.html) directly in any browser or launch a local web server:
+### Option A: Using the Header & Mobile Dock Component
+If you only need the sleek floating capsule header on desktop that morphs into a bottom thumb-zone dock on mobile:
 
-```bash
-# Using Python 3
-python -m http.server 8080
+1. Copy [`circle-menu-header.js`](circle-menu-header.js) into your project scripts.
+2. Include the HTML structure from [`header-circle-menu.html`](header-circle-menu.html).
+3. Initialize the header engine:
 
-# Or with npx serve
-npx serve .
+```javascript
+// Initialize Standalone Header Capsule & Mobile Bottom Dock
+const headerMenu = new HeaderCircleMenuEngine({
+    stageId: 'header-dial-container',
+    wheelId: 'header-menu-wheel',
+    wheelWrapperId: 'header-wheel-wrapper',
+    labelId: 'header-active-title',
+    centerHubId: 'header-center-logo',
+    centerHubScalerId: 'header-center-scaler',
+    triggerAreaId: 'header-dial-container',
+    isCompact: true,
+    data: menuData,
+    onSelect: (item, idx) => {
+        console.log('Selected:', item.label);
+    }
+});
 ```
 
-### 2. Copy to CodePen
-1. Open [`codepen-index.html`](codepen-index.html).
-2. Copy the entire file content into the **HTML** panel on [CodePen](https://codepen.io).
-3. The demo will render immediately with complete interactive physics and 60fps animations!
+---
+
+### Option B: Using the Hero Radial Engine Component
+If you want the central hero radial dial with gamer-style inertia pulling and tangent light beams:
+
+1. Copy [`circle-menu-hero.js`](circle-menu-hero.js) into your project scripts.
+2. Include the hero section markup from [`hero-circle-menu.html`](hero-circle-menu.html).
+3. Initialize the hero engine:
+
+```javascript
+// Initialize Standalone Hero Radial Menu Engine
+const heroMenu = new HeroCircleMenuEngine({
+    stageId: 'hero-dial-stage',
+    wheelId: 'menu-wheel',
+    wheelWrapperId: 'menu-wheel-wrapper',
+    outerRingId: 'outer-hub-ring',
+    centerHubId: 'center-hub',
+    centerHubScalerId: 'center-hub-scaler',
+    flashEffectId: 'flash-effect',
+    triggerAreaId: 'hero-interaction-zone', // Focused 70% aspect ratio interaction zone
+    labelId: 'active-category-title',
+    data: menuData,
+    onSelect: (item, idx) => {
+        console.log('Hero Sector Selected:', item.label, idx);
+    }
+});
+```
 
 ---
 
 ## ⚙️ Customization Guide: JavaScript Parameters
 
-All geometric, radial, offset, and hit-testing properties are centralized inside the **`getDimensions()`** method of `CircularMenuEngine`. You can calibrate each parameter globally or pass overrides directly in options when instantiating the menu:
+All geometric, radial, offset, and hit-testing properties are centralized inside the **`getDimensions()`** method of each engine. You can calibrate each parameter directly in options or inside the script:
 
 ```javascript
 getDimensions() {
@@ -271,37 +329,6 @@ const menuData = [
 ```
 
 - Clicking on any active **light beam**, **dash sector**, or **category title label** triggers a tactile ripple flash and opens the destination URL in a new tab (`window.open(item.url, '_blank', 'noopener,noreferrer')`).
-
----
-
-## 🏗️ Multi-Instance Instantiation Example
-
-To create a new circular menu instance anywhere on your page:
-
-```javascript
-const myCustomMenu = new CircularMenuEngine({
-    stageId: 'my-stage-container',          // Outer container element ID
-    wheelId: 'my-wheel-element',            // Rotating wheel element ID
-    wheelWrapperId: 'my-wheel-wrapper',     // Wrapper for reveal transitions
-    outerRingId: 'my-outer-ring',           // Concentric guide ring ID (optional)
-    centerHubId: 'my-center-button',        // Center logo/button ID
-    centerHubScalerId: 'my-center-scaler',  // Scaling emblem container
-    triggerAreaId: 'my-interaction-zone',   // Proximity trigger bounds
-    labelId: 'my-label-display',            // Active title text element ID
-    fixedTopLabelId: 'my-mobile-top-label', // Top HUD projection for mobile (optional)
-    flashEffectId: 'my-flash-ripple',       // Glow flash element ID (optional)
-    isHero: false,                          // Enable Hero scale logic
-    isCompact: true,                        // Enable compact header capsule logic
-    isMobileDock: false,                    // Enable mobile bottom dock logic
-    beamSVGWidth: 96,                       // Custom beam width override (optional)
-    beamHeight: 90,                         // Custom beam reach override (optional)
-    lerpFactor: 0.22,                       // Inertia smoothness factor (0.1 = smooth, 0.4 = snappy)
-    data: menuData,                         // Item array
-    onSelect: (item, index) => {
-        console.log(`Selected item: ${item.label} at index ${index}`);
-    }
-});
-```
 
 ---
 
